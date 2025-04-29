@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "nodemon server.js",
     "start": "node server.js",
-    "lint": "eslint -c .eslintrc.json .",
+    "lint": "eslint .",
     "test": "jest"
   },
   "dependencies": {
