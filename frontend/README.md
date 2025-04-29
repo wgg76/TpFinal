@@ -1,3 +1,5 @@
+![CI](https://github.com/wgg76/TpFinal/actions/workflows/ci.yml/badge.svg)
+
 Frontend - Mini Netflix
 
 Este directorio contiene la aplicación cliente de Mini Netflix, construida con:

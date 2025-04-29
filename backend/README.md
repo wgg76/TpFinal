@@ -1,4 +1,6 @@
-Backend - Mini Netflix API
+![CI](https://github.com/wgg76/TpFinal/actions/workflows/ci.yml/badge.svg)
+
+# Blockbuster Online
 
 Este directorio contiene la API RESTful de Mini Netflix, construida con:
 

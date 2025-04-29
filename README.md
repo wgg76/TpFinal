@@ -1,3 +1,5 @@
+![CI](https://github.com/wgg76/TpFinal/actions/workflows/ci.yml/badge.svg)
+
 Mini Netflix Fullstack
 
 Mini Netflix es una aplicación web fullstack que simula una plataforma de streaming tipo "mini Netflix", desarrollada con React en el frontend y Node.js/Express + MongoDB en el backend. Permite:
