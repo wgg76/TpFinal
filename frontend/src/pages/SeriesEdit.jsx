@@ -42,7 +42,7 @@ const SeriesEdit = () => {
           throw new Error('Error al cargar la serie');
         }
         const data = await response.json();
-        // console.log('🔥 Datos recibidos:', data); // opcional para debug
+        
         setForm({
           Title: data.Title || '',
           Poster: data.Poster || '',
@@ -57,9 +57,9 @@ const SeriesEdit = () => {
           imdbID: data.imdbID || '',
           Type: data.Type || 'series'
         });
-      } catch (error) {
-        console.error(error);
-        toast.error('No se pudo cargar la serie');
+      } catch {
+       
+       toast.error('No se pudo cargar la serie');
       } finally {
         setLoading(false);
       }
@@ -91,8 +91,8 @@ const SeriesEdit = () => {
       if (!response.ok) throw new Error('Error al actualizar');
       toast.success('Serie actualizada con éxito');
       navigate('/series');
-    } catch (error) {
-      console.error(error);
+    } catch {
+      
       toast.error('No se pudo actualizar la serie');
     }
   };

@@ -1,37 +1,38 @@
 // src/App.jsx
 
-import React, { useContext } from "react";
-import { Routes, Route } from "react-router-dom";
-import { AuthProvider, AuthContext } from "./context/AuthContext";
-import { SearchProvider } from "./context/SearchContext";
-import { ThemeProvider } from "./context/ThemeContext";
+ import React from "react";
+ import { Routes, Route } from "react-router-dom";
+ import { AuthProvider } from "./context/AuthContext";
 
-import Header from "./components/Header";
-import Footer from "./components/Footer";
+ import { SearchProvider } from "./context/SearchContext";
+ import { ThemeProvider } from "./context/ThemeContext";
 
-import Home from "./pages/Home";
-import LoginPage from "./pages/LoginPage";
-import Register from "./pages/Register";
-import ChooseProfile from "./pages/ChooseProfile";
-import ProfileForm from "./pages/ProfileForm";
-import MovieList from "./pages/MovieList";
-import MovieForm from "./pages/MovieForm";
-import MovieDetail from "./pages/MovieDetail";
-import SeriesList from "./pages/SeriesList";
-import SeriesForm from "./pages/SeriesForm";
-import SeriesDetail from "./pages/SeriesDetail";
-import WatchlistPage from "./pages/WatchlistPage";
-import RatingList from "./pages/RatingList";
-import NotFound from "./pages/NotFound";
+ import Header from "./components/Header";
+ import Footer from "./components/Footer";
 
-import PrivateRoute from "./components/PrivateRoute";
+ import Home from "./pages/Home";
+ import LoginPage from "./pages/LoginPage";
+ import Register from "./pages/Register";
+ import ChooseProfile from "./pages/ChooseProfile";
+ import ProfileForm from "./pages/ProfileForm";
+ import MovieList from "./pages/MovieList";
+ import MovieForm from "./pages/MovieForm";
+ import MovieDetail from "./pages/MovieDetail";
+ import SeriesList from "./pages/SeriesList";
+ import SeriesForm from "./pages/SeriesForm";
+ import SeriesDetail from "./pages/SeriesDetail";
+ import WatchlistPage from "./pages/WatchlistPage";
+ import RatingList from "./pages/RatingList";
+ import NotFound from "./pages/NotFound";
+
+ import PrivateRoute from "./components/PrivateRoute";
 
 function App() {
-  const { token } = useContext(AuthContext);
+   return (
+     <div className="flex flex-col min-h-screen">
+       <Header />
 
-  return (
-    <div className="flex flex-col min-h-screen">
-      <Header />
+
 
       <main className="flex-grow">
         <Routes>

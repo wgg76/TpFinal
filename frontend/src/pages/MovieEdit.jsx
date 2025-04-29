@@ -44,7 +44,7 @@ const MovieEdit = () => {
           Awards: data.Awards || "",
           Type: data.Type || "movie" // Obtener el valor actual, o por defecto "movie"
         });
-      } catch (error) {
+      } catch {
         toast.error("No se pudo cargar la película");
       } finally {
         setLoading(false);
@@ -83,7 +83,7 @@ const MovieEdit = () => {
       }
       toast.success("Película actualizada con éxito");
       navigate("/movies");
-    } catch (error) {
+    } catch {
       toast.error("No se pudo actualizar la película");
     }
   };

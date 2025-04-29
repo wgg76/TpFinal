@@ -73,8 +73,7 @@ const WatchlistPage = () => {
 
     try {
       // eliminamos uno a uno para actualizar activeProfile
-      for (const m of activeProfile.watchlist) {
-        // eslint-disable-next-line no-await-in-loop
+      for (const m of activeProfile.watchlist) {       
         await removeFromWatchlist(m);
       }
       setItems([]);

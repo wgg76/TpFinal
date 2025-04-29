@@ -1,6 +1,6 @@
 // src/context/AuthContext.jsx
 
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import api from "../services/api";
@@ -18,43 +18,52 @@ export function AuthProvider({ children }) {
     return { watchlist: [], ...prof };
   });
 
-  useEffect(() => {
-    const savedToken = localStorage.getItem("token");
-    if (!savedToken) return;
-    const { exp, userId, role } = JSON.parse(atob(savedToken.split(".")[1]));
-    if (exp * 1000 < Date.now()) {
-      logout();
-    } else {
-      setToken(savedToken);
-      setUser({ userId, role });
-      setTimeout(logout, exp * 1000 - Date.now());
-    }
-  }, []);
-
-  useEffect(() => {
-    if (activeProfile) {
-      localStorage.setItem("activeProfile", JSON.stringify(activeProfile));
-    } else {
-      localStorage.removeItem("activeProfile");
-    }
-  }, [activeProfile]);
-
-  const login = (newToken) => {
-    const { exp, userId, role } = JSON.parse(atob(newToken.split(".")[1]));
-    localStorage.setItem("token", newToken);
-    setToken(newToken);
-    setUser({ userId, role });
-    setActiveProfile(null);
-    setTimeout(logout, exp * 1000 - Date.now());
-  };
-
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem("token");
     localStorage.removeItem("activeProfile");
     setToken(null);
     setUser(null);
     setActiveProfile(null);
     navigate("/login");
+  }, [navigate]);
+
+  useEffect(() => {
+    const savedToken = localStorage.getItem("token");
+    if (!savedToken) return;
+    const { exp, userId, role } = JSON.parse(
+      atob(savedToken.split(".")[1])
+    );
+    if (exp * 1000 < Date.now()) {
+      logout();
+    } else {
+      setToken(savedToken);
+      setUser({ userId, role });
+      const timeout = exp * 1000 - Date.now();
+      setTimeout(logout, timeout);
+    }
+  }, [logout]);
+
+  useEffect(() => {
+    if (activeProfile) {
+      localStorage.setItem(
+        "activeProfile",
+        JSON.stringify(activeProfile)
+      );
+    } else {
+      localStorage.removeItem("activeProfile");
+    }
+  }, [activeProfile]);
+
+  const login = (newToken) => {
+    const { exp, userId, role } = JSON.parse(
+      atob(newToken.split(".")[1])
+    );
+    localStorage.setItem("token", newToken);
+    setToken(newToken);
+    setUser({ userId, role });
+    setActiveProfile(null);
+    const timeout = exp * 1000 - Date.now();
+    setTimeout(logout, timeout);
   };
 
   const addToWatchlist = async (itemId) => {
@@ -63,10 +72,14 @@ export function AuthProvider({ children }) {
       return;
     }
     try {
-      const updated = await api.watchlist.add(activeProfile._id, itemId, token);
+      const updated = await api.watchlist.add(
+        activeProfile._id,
+        itemId,
+        token
+      );
       setActiveProfile(updated);
       toast.success("Añadido a Favoritos");
-    } catch (err) {
+    } catch {
       toast.error("No se pudo añadir a Favoritos");
     }
   };
@@ -77,10 +90,14 @@ export function AuthProvider({ children }) {
       return;
     }
     try {
-      const updated = await api.watchlist.remove(activeProfile._id, itemId, token);
+      const updated = await api.watchlist.remove(
+        activeProfile._id,
+        itemId,
+        token
+      );
       setActiveProfile(updated);
       toast.info("Eliminado de Favoritos");
-    } catch (err) {
+    } catch {
       toast.error("No se pudo eliminar de Favoritos");
     }
   };

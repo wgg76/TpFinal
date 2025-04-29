@@ -74,7 +74,7 @@ const Header = () => {
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
-    } catch (err) {
+    } catch {
       toast.error("No se pudo descargar el reporte");
     }
   };

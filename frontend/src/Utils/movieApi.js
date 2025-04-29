@@ -1,20 +1,15 @@
 // src/utils/movieApi.js
 
-export const fetchMovies = async () => {
-  try {
+  export const fetchMovies = async () => {
     const response = await fetch("http://localhost:5000/api/movies");
     if (!response.ok) {
       throw new Error("Error al obtener películas");
     }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const fetchMoviesByName = async (name) => {
-  try {
+    return response.json();
+  };
+  
+ 
+  export const fetchMoviesByName = async (name) => {
     const response = await fetch("http://localhost:5000/api/movies");
     if (!response.ok) {
       throw new Error("Error al obtener películas");
@@ -24,7 +19,5 @@ export const fetchMoviesByName = async (name) => {
     return data.filter((movie) =>
       movie.Title.toLowerCase().includes(name.toLowerCase())
     );
-  } catch (error) {
-    throw error;
-  }
-};
+  };
+  

@@ -9,7 +9,7 @@
         "dev": "vite",
         "build": "vite build",
         "preview": "vite preview",
-        "lint": "eslint \"src/**/*.{js,jsx}\""
+        "lint": "eslint" 
     },
     "dependencies": {
         "@hookform/resolvers": "^5.0.1",
