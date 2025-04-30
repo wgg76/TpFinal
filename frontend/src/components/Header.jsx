@@ -9,6 +9,10 @@ import Swal from "sweetalert2";
 import { ThemeContext } from '../context/ThemeContext';
 import { toast } from "react-toastify";
 
+// ✏️ Asegúrate de tener en tu .env:
+// VITE_API_URL=https://tpfinal-7qos.onrender.com/api
+const API_BASE = import.meta.env.VITE_API_URL || "";
+
 const Header = () => {
   const { pathname } = useLocation();
   const { searchTerm, setSearchTerm } = useContext(SearchContext);
@@ -16,7 +20,7 @@ const Header = () => {
   const { theme, toggleTheme } = useContext(ThemeContext);
   const navigate = useNavigate();
 
-  // Ocultar botones en login, registro o en home si NO hay usuario logueado
+  // Ocultar en login / register / home sin usuario
   const hideButtons =
     pathname === "/login" ||
     pathname === "/register" ||
@@ -36,12 +40,15 @@ const Header = () => {
   const handleSeed = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("/api/movies/seed", {
+      const res = await fetch(`${API_BASE}/movies/seed`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || `Status ${res.status}`);
+      }
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || `Status ${res.status}`);
       await Swal.fire({
         icon: "success",
         title: "¡Carga masiva completada!",
@@ -56,11 +63,10 @@ const Header = () => {
     }
   };
 
-  // Nuevo handler para descargar el reporte con token
   const handleReport = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("/api/reports/views", {
+      const res = await fetch(`${API_BASE}/reports/views`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error("No autorizado o error en servidor");
@@ -69,7 +75,7 @@ const Header = () => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "views_report.csv";
+      a.download = "views_report.xlsx";
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -79,7 +85,6 @@ const Header = () => {
     }
   };
 
-  // Botón estándar con variantes light/dark
   const btnStyle = `
     px-4 py-2
     bg-gray-200 dark:bg-gray-700
@@ -90,83 +95,42 @@ const Header = () => {
   `;
 
   return (
-    <header
-      className={`
-        bg-white dark:bg-[#0a0a23]
-        text-gray-900 dark:text-yellow-400
-        py-4 px-6 shadow-md
-        transition-colors duration-300
-      `}
-    >
-      {/* Row 1: Title */}
+    <header className="bg-white dark:bg-[#0a0a23] text-gray-900 dark:text-yellow-400 py-4 px-6 shadow-md transition-colors duration-300">
+      {/* Título */}
       <div className="flex justify-center">
         <h1 className="text-4xl md:text-5xl font-serif font-semibold tracking-tight uppercase">
           🎬 Blockbuster Online
         </h1>
       </div>
 
-      {/* Row 2: Theme Toggle */}
+      {/* Theme toggle */}
       {!hideButtons && (
         <div className="mt-2 flex justify-end">
-          <button
-            onClick={toggleTheme}
-            className={`
-              px-3 py-1
-              bg-gray-200 dark:bg-gray-700
-              text-gray-900 dark:text-white
-              rounded-lg shadow
-              hover:bg-gray-300 dark:hover:bg-gray-600
-              transition-colors
-            `}
-          >
+          <button onClick={toggleTheme} className="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg shadow hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
             {theme === "dark" ? "Claro" : "Oscuro"}
           </button>
         </div>
       )}
 
-      {/* Row 3: Navigation Buttons */}
+      {/* Navegación */}
       {!hideButtons && (
         <nav className="mt-4 flex flex-wrap justify-center gap-4">
-          {user && pathname !== "/home" && (
-            <Link to="/home" className={btnStyle}>
-              🏠 Inicio
-            </Link>
-          )}
-          {pathname !== "/series" && (
-            <Link to="/series" className={btnStyle}>
-              Series
-            </Link>
-          )}
-          {pathname !== "/movies" && (
-            <Link to="/movies" className={btnStyle}>
-              Películas
-            </Link>
-          )}
-          {pathname !== "/rating" && (
-            <Link to="/rating" className={btnStyle}>
-              Rating
-            </Link>
-          )}
+          {user && pathname !== "/home" && <Link to="/home" className={btnStyle}>🏠 Inicio</Link>}
+          {pathname !== "/series" && <Link to="/series" className={btnStyle}>Series</Link>}
+          {pathname !== "/movies" && <Link to="/movies" className={btnStyle}>Películas</Link>}
+          {pathname !== "/rating" && <Link to="/rating" className={btnStyle}>Rating</Link>}
 
           {user?.role === "admin" && isMoviesPage && (
-            <Link to="/movies/create" className={btnStyle}>
-              Agregar Película
-            </Link>
+            <Link to="/movies/create" className={btnStyle}>Agregar Película</Link>
           )}
           {user?.role === "admin" && isSeriesPage && (
-            <Link to="/series/create" className={btnStyle}>
-              Agregar Serie
-            </Link>
+            <Link to="/series/create" className={btnStyle}>Agregar Serie</Link>
           )}
           {user?.role === "admin" && (
-            <button onClick={handleSeed} className={btnStyle}>
-              🚀 Carga masiva
-            </button>
+            <button onClick={handleSeed} className={btnStyle}>🚀 Carga masiva</button>
           )}
           {user?.role === "admin" && (
-            <button onClick={handleReport} className={btnStyle}>
-              Reporte
-            </button>
+            <button onClick={handleReport} className={btnStyle}>Reporte</button>
           )}
 
           {user && activeProfile && (
@@ -175,14 +139,12 @@ const Header = () => {
             </Link>
           )}
           {user && (
-            <button onClick={handleLogout} className={btnStyle}>
-              Cerrar Sesión
-            </button>
+            <button onClick={handleLogout} className={btnStyle}>Cerrar Sesión</button>
           )}
         </nav>
       )}
 
-      {/* Row 4: Search Bar */}
+      {/* Search Bar */}
       {isSearchable && (
         <div className="mt-4 w-full max-w-3xl mx-auto">
           <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
