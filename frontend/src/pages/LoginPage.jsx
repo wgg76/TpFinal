@@ -19,6 +19,7 @@ export default function LoginPage() {
     e.preventDefault();
     try {
       // 1) Iniciar sesión y guardar token
+      console.log("🔥 API_BASE =", API_BASE);
       const res = await fetch(`${API_BASE}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
