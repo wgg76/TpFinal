@@ -53,13 +53,7 @@ export default function LoginPage() {
       <div className="w-full max-w-xl">
         <form
           onSubmit={handleSubmit}
-          className="
-            bg-white 
-            p-6 sm:p-10 
-            rounded-lg 
-            shadow-md 
-            w-full
-          "
+          className="bg-white p-8 rounded shadow-md w-full max-w-full sm:max-w-md"
         >
           <h2 className="text-3xl sm:text-4xl font-bold mb-8 text-center">
             Iniciar Sesión
