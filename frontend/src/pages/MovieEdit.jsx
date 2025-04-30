@@ -255,6 +255,6 @@ function MovieEdit() {
       </div>
     </div>
   );
-};
+}
 
-export default MovieEdit;
+export default MovieEdit

@@ -273,6 +273,6 @@ function SeriesEdit() {
       </div>
     </div>
   );
-};
+}
 
-export default SeriesEdit;
+export default SeriesEdit
