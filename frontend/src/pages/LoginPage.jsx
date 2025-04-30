@@ -30,7 +30,7 @@ export default function LoginPage() {
       toast.success("Inicio de sesión exitoso");
 
       // 2) Obtener perfiles existentes
-      const perfRes = await fetch(`${API_BASE}/api/profiles`, {
+      const perfRes = await fetch(`${API_BASE}/profiles`, {
         headers: { Authorization: `Bearer ${data.token}` },
       });
       const perfiles = perfRes.ok ? await perfRes.json() : [];
