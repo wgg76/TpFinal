@@ -49,23 +49,23 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4 sm:p-8">
-      <div className="w-full px-4 sm:px-0 max-w-full sm:max-w-md md:max-w-lg lg:max-w-xl">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 sm:px-8">
+      <div className="w-full max-w-xl">
         <form
           onSubmit={handleSubmit}
           className="
             bg-white 
-            p-6 sm:p-8 
+            p-6 sm:p-10 
             rounded-lg 
             shadow-md 
-            w-full 
+            w-full
           "
         >
-          <h2 className="text-3xl sm:text-4xl font-bold mb-6 text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-8 text-center">
             Iniciar Sesión
           </h2>
 
-          <div className="mb-4">
+          <div className="mb-6">
             <label htmlFor="email" className="block mb-2 text-lg">
               Email
             </label>
@@ -77,11 +77,11 @@ export default function LoginPage() {
               value={credentials.email}
               onChange={handleChange}
               required
-              className="w-full p-3 border rounded text-lg"
+              className="w-full text-lg p-3 rounded border focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
           </div>
 
-          <div className="mb-6">
+          <div className="mb-8">
             <label htmlFor="password" className="block mb-2 text-lg">
               Contraseña
             </label>
@@ -93,20 +93,20 @@ export default function LoginPage() {
               value={credentials.password}
               onChange={handleChange}
               required
-              className="w-full p-3 border rounded text-lg"
+              className="w-full text-lg p-3 rounded border focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
           </div>
 
           <button
             type="submit"
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded text-lg mb-4"
+            className="w-full py-4 text-lg font-semibold rounded bg-blue-600 hover:bg-blue-700 text-white transition-colors"
           >
             Acceder
           </button>
 
-          <p className="mt-4 text-center text-base sm:text-lg">
+          <p className="mt-6 text-center text-base">
             ¿No tienes cuenta?{" "}
-            <Link to="/register" className="text-blue-500 hover:underline">
+            <Link to="/register" className="text-blue-600 hover:underline">
               Regístrate
             </Link>
           </p>
