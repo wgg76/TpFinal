@@ -50,63 +50,62 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 sm:px-6 lg:px-8">
-  <div className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">
-    <form
-      onSubmit={handleSubmit}
-      className="bg-white p-4 sm:p-6 md:p-8 rounded shadow-lg w-full"
-    >
-      <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mb-6 text-center">
-        Iniciar Sesión
-      </h2>
+      <div className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white p-6 sm:p-8 rounded shadow-lg w-full"
+        >
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 text-center">
+            Iniciar Sesión
+          </h2>
 
-      <div className="mb-4">
-        <label htmlFor="email" className="block mb-2 text-sm sm:text-base lg:text-lg">
-          Email
-        </label>
-        <input
-          type="email"
-          name="email"
-          id="email"
-          placeholder="usuario@ejemplo.com"
-          value={credentials.email}
-          onChange={handleChange}
-          required
-          className="w-full p-2 sm:p-3 md:p-4 text-sm sm:text-base lg:text-lg rounded border focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
+          <div className="mb-5 sm:mb-6">
+            <label htmlFor="email" className="block mb-2 text-base sm:text-lg">
+              Email
+            </label>
+            <input
+              type="email"
+              name="email"
+              id="email"
+              placeholder="usuario@ejemplo.com"
+              value={credentials.email}
+              onChange={handleChange}
+              required
+              className="w-full p-3 text-base sm:text-lg rounded border focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+          </div>
+
+          <div className="mb-7 sm:mb-8">
+            <label htmlFor="password" className="block mb-2 text-base sm:text-lg">
+              Contraseña
+            </label>
+            <input
+              type="password"
+              name="password"
+              id="password"
+              placeholder="••••••••"
+              value={credentials.password}
+              onChange={handleChange}
+              required
+              className="w-full p-3 text-base sm:text-lg rounded border focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full py-3 text-lg sm:text-xl font-semibold rounded bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+          >
+            Acceder
+          </button>
+
+          <p className="mt-5 sm:mt-6 text-center text-base sm:text-lg">
+            ¿No tienes cuenta?{" "}
+            <Link to="/register" className="text-blue-600 hover:underline">
+              Regístrate
+            </Link>
+          </p>
+        </form>
       </div>
-
-      <div className="mb-6">
-        <label htmlFor="password" className="block mb-2 text-sm sm:text-base lg:text-lg">
-          Contraseña
-        </label>
-        <input
-          type="password"
-          name="password"
-          id="password"
-          placeholder="••••••••"
-          value={credentials.password}
-          onChange={handleChange}
-          required
-          className="w-full p-2 sm:p-3 md:p-4 text-sm sm:text-base lg:text-lg rounded border focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
-      </div>
-
-      <button
-        type="submit"
-        className="w-full py-2 sm:py-3 md:py-4 text-base sm:text-lg md:text-xl font-semibold rounded bg-blue-600 hover:bg-blue-700 text-white transition-colors"
-      >
-        Acceder
-      </button>
-
-      <p className="mt-4 sm:mt-6 text-center text-sm sm:text-base md:text-lg">
-        ¿No tienes cuenta?{" "}
-        <Link to="/register" className="text-blue-600 hover:underline">
-          Regístrate
-        </Link>
-      </p>
-    </form>
-  </div>
-</div>
+    </div>
   );
-  
 }
