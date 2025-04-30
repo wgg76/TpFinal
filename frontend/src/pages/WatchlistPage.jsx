@@ -1,6 +1,7 @@
 // src/pages/WatchlistPage.jsx
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
+import api from "../services/api";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
@@ -21,15 +22,13 @@ const WatchlistPage = () => {
       try {
         const movies = await Promise.all(
           (activeProfile.watchlist || []).map((movieId) =>
-            fetch(`/api/movies/${movieId}`, {
-              headers: { Authorization: `Bearer ${token}` },
-            }).then((r) => {
-              if (!r.ok) throw new Error();
-              return r.json();
-            })
+            api.movies
+              .get(movieId, token, { refresh: true })
+              .catch(() => null)
           )
         );
-        setItems(movies);
+        // Filtramos los null en caso de error en alguna llamada
+        setItems(movies.filter(Boolean));
       } catch {
         toast.error("Error cargando favoritos");
       } finally {
