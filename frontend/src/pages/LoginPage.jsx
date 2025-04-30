@@ -49,8 +49,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 sm:px-8">
-  <div className="w-full max-w-xs sm:max-w-sm md:max-w-lg lg:max-w-xl">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 sm:px-6 lg:px-8">
+  <div className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">
     <form
       onSubmit={handleSubmit}
       className="bg-white p-4 sm:p-6 md:p-8 rounded shadow-lg w-full"
@@ -107,8 +107,6 @@ export default function LoginPage() {
     </form>
   </div>
 </div>
-
-
   );
   
 }
