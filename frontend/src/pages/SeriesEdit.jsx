@@ -1,11 +1,14 @@
 // src/pages/SeriesEdit.jsx
+
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import background from '../assets/descarga.jpeg';
 import { AuthContext } from '../context/AuthContext';
 
-const SeriesEdit = () => {
+const API_BASE = import.meta.env.VITE_API_URL || "";
+
+function SeriesEdit() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { token } = useContext(AuthContext);
@@ -29,20 +32,18 @@ const SeriesEdit = () => {
 
   // Cargar datos existentes para editar la serie
   useEffect(() => {
-    const fetchSeries = async () => {
+    (async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/movies/${id}`, {
+        const res = await fetch(`${API_BASE}/movies/${id}`, {
           method: 'GET',
-          cache: 'no-store',                    // ← deshabilita caché del navegador
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+          cache: 'no-store',  // deshabilita caché del navegador
+          headers: token
+            ? { Authorization: `Bearer ${token}` }
+            : undefined
         });
-        if (!response.ok) {
-          throw new Error('Error al cargar la serie');
-        }
-        const data = await response.json();
-        
+        if (!res.ok) throw new Error('Error al cargar la serie');
+
+        const data = await res.json();
         setForm({
           Title: data.Title || '',
           Poster: data.Poster || '',
@@ -57,15 +58,13 @@ const SeriesEdit = () => {
           imdbID: data.imdbID || '',
           Type: data.Type || 'series'
         });
-      } catch {
-       
-       toast.error('No se pudo cargar la serie');
+      } catch (err) {
+        console.error(err);
+        toast.error('No se pudo cargar la serie');
       } finally {
         setLoading(false);
       }
-    };
-  
-    fetchSeries();
+    })();
   }, [id, token]);
   
 

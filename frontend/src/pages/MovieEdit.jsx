@@ -1,12 +1,18 @@
+
 // src/pages/MovieEdit.jsx
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect, useContext } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import background from '../assets/fondo 2.png';
+import { AuthContext } from '../context/AuthContext';
 
-const MovieEdit = () => {
+const API_BASE = import.meta.env.VITE_API_URL || "";
+
+function MovieEdit() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { token } = useContext(AuthContext);
 
   // Estado del formulario con el campo Type
   const [form, setForm] = useState({
@@ -19,19 +25,21 @@ const MovieEdit = () => {
     Writer: "",
     Actors: "",
     Awards: "",
-    Type: "movie" // Valor por defecto
+    Type: "movie", // Valor por defecto
   });
-  
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchMovie = async () => {
+    (async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/movies/${id}`);
-        if (!response.ok) {
-          throw new Error("Error al cargar la película");
-        }
-        const data = await response.json();
+        // Construimos la URL usando VITE_API_URL en prod o el proxy de Vite en dev
+        const res = await fetch(`${API_BASE}/movies/${id}`, {
+          headers: token
+            ? { Authorization: `Bearer ${token}` }
+            : undefined,
+        });
+        if (!res.ok) throw new Error("Error al cargar la película");
+        const data = await res.json();
         setForm({
           Title: data.Title || "",
           Poster: data.Poster || "",
@@ -42,17 +50,16 @@ const MovieEdit = () => {
           Writer: data.Writer || "",
           Actors: data.Actors || "",
           Awards: data.Awards || "",
-          Type: data.Type || "movie" // Obtener el valor actual, o por defecto "movie"
+          Type: data.Type || "movie",
         });
-      } catch {
+      } catch (err) {
+        console.error(err);
         toast.error("No se pudo cargar la película");
       } finally {
         setLoading(false);
       }
-    };
-
-    fetchMovie();
-  }, [id]);
+    })();
+  }, [id, token]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });

@@ -5,6 +5,8 @@ import { AuthContext } from "../context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
+const API_BASE = import.meta.env.VITE_API_URL || "";
+
 export default function ChooseProfile() {
   const { token, activeProfile, setActiveProfile } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -15,8 +17,10 @@ export default function ChooseProfile() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch("/api/profiles", {
-          headers: { Authorization: `Bearer ${token}` },
+        const res = await fetch(`${API_BASE}/profiles`, {
+          headers: token
+            ? { Authorization: `Bearer ${token}` }
+            : undefined,
         });
         if (!res.ok) throw new Error(`Error ${res.status}`);
         setProfiles(await res.json());
@@ -31,7 +35,7 @@ export default function ChooseProfile() {
 
   const handleSelect = (p) => {
     setActiveProfile(p);
-    navigate("/movies");  // Ahora va directo a películas
+    navigate("/movies");
   };
 
   if (loading) return <p className="text-center py-10">Cargando perfiles…</p>;

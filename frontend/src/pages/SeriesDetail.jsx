@@ -1,11 +1,14 @@
 // src/pages/SeriesDetail.jsx
+
 import React, { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Background from "../assets/descarga.jpeg";
 import { AuthContext } from "../context/AuthContext";
 
-const SeriesDetail = () => {
+const API_BASE = import.meta.env.VITE_API_URL || "";
+
+function SeriesDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { token, activeProfile, addToWatchlist, removeFromWatchlist } =
@@ -15,14 +18,20 @@ const SeriesDetail = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!activeProfile) {
+      navigate("/profiles");
+      return;
+    }
+
     (async () => {
       try {
         const isImdb = /^tt\d+$/.test(id);
-        const url = isImdb
-          ? `http://localhost:5000/api/movies/imdb/${id}`
-          : `http://localhost:5000/api/movies/${id}`;
+        // En prod usa tu BACKEND, en dev cae en el proxy de Vite a localhost:5000
+        const endpoint = isImdb
+          ? `${API_BASE}/movies/imdb/${id}`
+          : `${API_BASE}/movies/${id}`;
 
-        const res = await fetch(url, {
+        const res = await fetch(endpoint, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error("Error al cargar la serie");
@@ -34,7 +43,7 @@ const SeriesDetail = () => {
         setLoading(false);
       }
     })();
-  }, [id, token]);
+  }, [id, token, activeProfile, navigate]);
 
   const handleToggleFav = () => {
     if (!activeProfile) return toast.info("Selecciona primero un perfil");

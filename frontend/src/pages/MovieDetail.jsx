@@ -4,6 +4,8 @@ import { toast } from "react-toastify";
 import Background from "../assets/descarga.jpeg";
 import { AuthContext } from "../context/AuthContext";
 
+const API_BASE = import.meta.env.VITE_API_URL || "";
+
 const MovieDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -17,11 +19,11 @@ const MovieDetail = () => {
     (async () => {
       try {
         const isImdb = /^tt\d+$/.test(id);
-        const url = isImdb
-          ? `http://localhost:5000/api/movies/imdb/${id}`
-          : `http://localhost:5000/api/movies/${id}`;
+        const endpoint = isImdb
+          ? `${API_BASE}/movies/imdb/${id}`
+          : `${API_BASE}/movies/${id}`;
 
-        const res = await fetch(url, {
+        const res = await fetch(endpoint, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error("Error al cargar la película");

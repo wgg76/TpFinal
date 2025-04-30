@@ -1,21 +1,28 @@
 // src/pages/BulkUploader.jsx
-import React from "react";
 
-const BulkUploader = () => {
+import React, { useContext } from "react";
+import { toast } from "react-toastify";
+import { AuthContext } from "../context/AuthContext";
+
+const API_BASE = import.meta.env.VITE_API_URL || "";
+// Asegúrate de colocar movies.json en /public/data/movies.json
+const SOURCE_URL = "/data/movies.json";
+
+export default function BulkUploader() {
+  const { token } = useContext(AuthContext);
+
   const handleUpload = async () => {
-    // Usa tu API propia, no MockAPI
-    const apiUrl = "http://localhost:5000/api/movies";
-    // Fuente: ahora apunta a tu propio archivo JSON
-    const sourceUrl = "../data/movies.json";
-
-
     try {
-      const response = await fetch(sourceUrl);
-      const data = await response.json();
-      const first20 = data.slice(0, 20); // Cargamos los primeros 20 registros
+      // 1) Cargar el JSON local
+      const resp = await fetch(SOURCE_URL);
+      if (!resp.ok) throw new Error("No se pudo cargar movies.json");
+      const data = await resp.json();
 
+      // 2) Tomar los primeros 20
+      const first20 = data.slice(0, 20);
+
+      // 3) Insertar uno a uno en tu propia API
       for (const movie of first20) {
-        // Aquí creamos un objeto con solo la estructura deseada para películas.
         const newMovie = {
           Title: movie.Title,
           Year: movie.Year,
@@ -37,26 +44,29 @@ const BulkUploader = () => {
           imdbID: movie.imdbID,
           Type: movie.Type,
           Response: movie.Response,
-          Images: movie.Images
+          Images: movie.Images,
         };
 
-        const postResponse = await fetch(apiUrl, {
+        const postRes = await fetch(`${API_BASE}/movies`, {
           method: "POST",
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : undefined,
           },
-          body: JSON.stringify(newMovie)
+          body: JSON.stringify(newMovie),
         });
 
-        if (!postResponse.ok) {
-          console.error(`❌ Error cargando: ${movie.Title}`);
+        if (!postRes.ok) {
+          console.error(`❌ Error cargando '${movie.Title}': ${postRes.status}`);
         } else {
           console.log(`✅ Cargado: ${movie.Title}`);
         }
       }
-      alert("Carga masiva finalizada ✅");
-    } catch (error) {
-      console.error("❌ Error al cargar películas:", error);
+
+      toast.success("Carga masiva finalizada ✅");
+    } catch (err) {
+      console.error("❌ Error en carga masiva:", err);
+      toast.error("Error al realizar la carga masiva");
     }
   };
 
@@ -71,6 +81,4 @@ const BulkUploader = () => {
       </button>
     </div>
   );
-};
-
-export default BulkUploader;
+}
