@@ -49,18 +49,18 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 sm:px-8">
-      <div className="w-full max-w-xl">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 md:px-8">
+      <div className="w-full max-w-lg lg:max-w-xl">
         <form
           onSubmit={handleSubmit}
-          className="bg-white p-8 rounded shadow-md w-full max-w-full sm:max-w-md"
+          className="bg-white p-6 md:p-8 rounded shadow-lg w-full"
         >
-          <h2 className="text-3xl sm:text-4xl font-bold mb-8 text-center">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-6 text-center">
             Iniciar Sesión
           </h2>
-
-          <div className="mb-6">
-            <label htmlFor="email" className="block mb-2 text-lg">
+  
+          <div className="mb-4 md:mb-6">
+            <label htmlFor="email" className="block mb-2 text-base md:text-lg">
               Email
             </label>
             <input
@@ -71,12 +71,12 @@ export default function LoginPage() {
               value={credentials.email}
               onChange={handleChange}
               required
-              className="w-full text-lg p-3 rounded border focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full p-3 md:p-4 text-base md:text-lg rounded border focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
           </div>
-
-          <div className="mb-8">
-            <label htmlFor="password" className="block mb-2 text-lg">
+  
+          <div className="mb-6 md:mb-8">
+            <label htmlFor="password" className="block mb-2 text-base md:text-lg">
               Contraseña
             </label>
             <input
@@ -87,18 +87,18 @@ export default function LoginPage() {
               value={credentials.password}
               onChange={handleChange}
               required
-              className="w-full text-lg p-3 rounded border focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full p-3 md:p-4 text-base md:text-lg rounded border focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
           </div>
-
+  
           <button
             type="submit"
-            className="w-full py-4 text-lg font-semibold rounded bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+            className="w-full py-3 md:py-4 text-base md:text-lg font-semibold rounded bg-blue-600 hover:bg-blue-700 text-white transition-colors"
           >
             Acceder
           </button>
-
-          <p className="mt-6 text-center text-base">
+  
+          <p className="mt-4 md:mt-6 text-center text-sm md:text-base">
             ¿No tienes cuenta?{" "}
             <Link to="/register" className="text-blue-600 hover:underline">
               Regístrate
@@ -108,4 +108,5 @@ export default function LoginPage() {
       </div>
     </div>
   );
+  
 }
