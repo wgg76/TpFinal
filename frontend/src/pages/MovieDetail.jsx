@@ -1,21 +1,31 @@
+// src/pages/MovieDetail.jsx
+
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import Background from "../assets/descarga.jpeg";
 import { AuthContext } from "../context/AuthContext";
 
-const API_BASE = import.meta.env.VITE_API_URL || "";
+const API_BASE = import.meta.env.VITE_API_URL || "/api";
 
-const MovieDetail = () => {
+export default function MovieDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { token, activeProfile, addToWatchlist, removeFromWatchlist } =
-    useContext(AuthContext);
+  const {
+    token,
+    activeProfile,
+    addToWatchlist,
+    removeFromWatchlist,
+  } = useContext(AuthContext);
 
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!activeProfile) {
+      navigate("/profiles");
+      return;
+    }
     (async () => {
       try {
         const isImdb = /^tt\d+$/.test(id);
@@ -24,7 +34,9 @@ const MovieDetail = () => {
           : `${API_BASE}/movies/${id}`;
 
         const res = await fetch(endpoint, {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: token
+            ? { Authorization: `Bearer ${token}` }
+            : undefined,
         });
         if (!res.ok) throw new Error("Error al cargar la película");
         setMovie(await res.json());
@@ -35,10 +47,13 @@ const MovieDetail = () => {
         setLoading(false);
       }
     })();
-  }, [id, token]);
+  }, [id, token, activeProfile, navigate]);
 
   const handleToggleFav = () => {
-    if (!activeProfile) return toast.info("Selecciona primero un perfil");
+    if (!activeProfile) {
+      toast.info("Selecciona primero un perfil");
+      return;
+    }
     if (activeProfile.watchlist?.includes(id)) {
       removeFromWatchlist(id);
       toast.info("Película removida de favoritos");
@@ -49,7 +64,7 @@ const MovieDetail = () => {
   };
 
   if (loading) return <p className="text-center">Cargando…</p>;
-  if (!movie)   return <p className="text-center">Película no encontrada.</p>;
+  if (!movie) return <p className="text-center">Película no encontrada.</p>;
 
   return (
     <div
@@ -63,7 +78,9 @@ const MovieDetail = () => {
       }}
     >
       <div className="max-w-md mx-auto bg-white p-6 rounded shadow text-black">
-        <h1 className="text-center font-bold mb-4 text-xl">{movie.Title}</h1>
+        <h1 className="text-center font-bold mb-4 text-xl">
+          {movie.Title}
+        </h1>
 
         {movie.Poster && movie.Poster !== "N/A" ? (
           <img
@@ -76,49 +93,42 @@ const MovieDetail = () => {
           <p className="text-center mb-4">Sin imagen</p>
         )}
 
-        {/* ---- Campos básicos ---- */}
         <p><strong>Año:</strong> {movie.Year || "N/A"}</p>
         <p><strong>Género:</strong> {movie.Genre || "N/A"}</p>
-        <p><strong>Clasificación (Rated):</strong> {movie.Rated || "N/A"}</p>
-        <p><strong>Sinopsis corta:</strong> {movie.Plot || "N/A"}</p>
+        <p><strong>Clasificación:</strong> {movie.Rated || "N/A"}</p>
+        <p><strong>Sinopsis:</strong> {movie.Plot || "N/A"}</p>
 
-        {/* ---- Extras ---- */}
-        <p className="mt-4">
-          <strong>Plot completo:</strong><br/>
-          {movie.Plot || "N/A"}
-        </p>
-
-        {movie.Metascore !== "N/A" && (
+        {movie.Metascore != null && (
           <p><strong>Metascore:</strong> {movie.Metascore}</p>
         )}
 
         <div>
           <strong>Ratings:</strong>
           <ul className="list-disc ml-5">
-            {movie.Ratings?.length ? (
-              movie.Ratings.map((r, i) => (
-                <li key={i}>{r.Source}: {r.Value}</li>
-              ))
-            ) : (
-              <li>
-                IMDb Rating: {movie.imdbRating ?? "N/A"}
-                {movie.imdbVotes ? ` (${movie.imdbVotes} votos)` : ""}
-              </li>
-            )}
+            {movie.Ratings?.length > 0
+              ? movie.Ratings.map((r, i) => (
+                  <li key={i}>
+                    {r.Source}: {r.Value}
+                  </li>
+                ))
+              : (
+                <li>
+                  IMDb: {movie.imdbRating ?? "N/A"}
+                  {movie.imdbVotes ? ` (${movie.imdbVotes} votos)` : ""}
+                </li>
+              )}
           </ul>
         </div>
 
-        {/* ---- Botones ---- */}
         <div className="mt-6 flex justify-between">
           <button
             onClick={handleToggleFav}
             className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
           >
-            {activeProfile?.watchlist?.includes(id)
+            {activeProfile.watchlist?.includes(id)
               ? "Quitar Favoritos"
               : "Agregar Favoritos"}
           </button>
-
           <button
             onClick={() => navigate(-1)}
             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
@@ -129,6 +139,4 @@ const MovieDetail = () => {
       </div>
     </div>
   );
-};
-
-export default MovieDetail;
+}

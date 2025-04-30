@@ -6,13 +6,17 @@ import { toast } from "react-toastify";
 import Background from "../assets/descarga.jpeg";
 import { AuthContext } from "../context/AuthContext";
 
-const API_BASE = import.meta.env.VITE_API_URL || "";
+const API_BASE = import.meta.env.VITE_API_URL || "/api";
 
-function SeriesDetail() {
+export default function SeriesDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { token, activeProfile, addToWatchlist, removeFromWatchlist } =
-    useContext(AuthContext);
+  const {
+    token,
+    activeProfile,
+    addToWatchlist,
+    removeFromWatchlist,
+  } = useContext(AuthContext);
 
   const [series, setSeries] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -22,17 +26,17 @@ function SeriesDetail() {
       navigate("/profiles");
       return;
     }
-
     (async () => {
       try {
         const isImdb = /^tt\d+$/.test(id);
-        // En prod usa tu BACKEND, en dev cae en el proxy de Vite a localhost:5000
         const endpoint = isImdb
-          ? `${API_BASE}/movies/imdb/${id}`
-          : `${API_BASE}/movies/${id}`;
+          ? `${API_BASE}/series/imdb/${id}`
+          : `${API_BASE}/series/${id}`;
 
         const res = await fetch(endpoint, {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: token
+            ? { Authorization: `Bearer ${token}` }
+            : undefined,
         });
         if (!res.ok) throw new Error("Error al cargar la serie");
         setSeries(await res.json());
@@ -46,7 +50,10 @@ function SeriesDetail() {
   }, [id, token, activeProfile, navigate]);
 
   const handleToggleFav = () => {
-    if (!activeProfile) return toast.info("Selecciona primero un perfil");
+    if (!activeProfile) {
+      toast.info("Selecciona primero un perfil");
+      return;
+    }
     if (activeProfile.watchlist?.includes(id)) {
       removeFromWatchlist(id);
       toast.info("Serie removida de favoritos");
@@ -71,7 +78,9 @@ function SeriesDetail() {
       }}
     >
       <div className="max-w-md mx-auto bg-white p-6 rounded shadow text-black">
-        <h1 className="text-2xl font-bold text-center mb-4">{series.Title}</h1>
+        <h1 className="text-2xl font-bold text-center mb-4">
+          {series.Title}
+        </h1>
 
         {series.Poster && series.Poster !== "N/A" ? (
           <img
@@ -84,55 +93,25 @@ function SeriesDetail() {
           <p className="text-center mb-4">Sin imagen</p>
         )}
 
-        {/* Campos básicos */}
         <p>
-          <strong>Temporadas:</strong> {series.totalSeasons || "N/A"}
+          <strong>Temporadas:</strong>{" "}
+          {series.totalSeasons ?? "N/A"}
         </p>
         <p>
-          <strong>Clasificación (Rated):</strong> {series.Rated || "N/A"}
+          <strong>Clasificación:</strong> {series.Rated ?? "N/A"}
         </p>
-        <p>
-          <strong>Sinopsis corta:</strong> {series.Plot || "N/A"}
-        </p>
-
-        {/* Campos extras */}
         <p className="mt-4">
-          <strong>Plot completo:</strong>
+          <strong>Sinopsis:</strong>
           <br />
-          {series.Plot || "N/A"}
+          {series.Plot ?? "N/A"}
         </p>
 
-        {series.Metascore !== "N/A" && (
-          <p>
-            <strong>Metascore:</strong> {series.Metascore}
-          </p>
-        )}
-
-        <div>
-          <strong>Ratings:</strong>
-          <ul className="list-disc ml-5">
-            {series.Ratings?.length ? (
-              series.Ratings.map((r, i) => (
-                <li key={i}>
-                  {r.Source}: {r.Value}
-                </li>
-              ))
-            ) : (
-              <li>
-                IMDb Rating: {series.imdbRating ?? "N/A"}
-                {series.imdbVotes ? ` (${series.imdbVotes} votos)` : ""}
-              </li>
-            )}
-          </ul>
-        </div>
-
-        {/* Botones */}
         <div className="mt-6 flex justify-between">
           <button
             onClick={handleToggleFav}
             className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
           >
-            {activeProfile?.watchlist?.includes(id)
+            {activeProfile.watchlist?.includes(id)
               ? "Quitar Favoritos"
               : "Agregar Favoritos"}
           </button>
@@ -146,6 +125,4 @@ function SeriesDetail() {
       </div>
     </div>
   );
-};
-
-export default SeriesDetail;
+}
