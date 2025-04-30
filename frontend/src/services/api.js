@@ -22,12 +22,12 @@ async function request(path, { method = "GET", body, token } = {}) {
 
 export const auth = {
   register: (email, password, role) =>
-    request("/api/auth/register", {
+    request("/auth/register", {
       method: "POST",
       body: { email, password, role },
     }),
   login: (email, password) =>
-    request("/api/auth/login", {
+    request("/auth/login", {
       method: "POST",
       body: { email, password },
     }),
@@ -36,41 +36,44 @@ export const auth = {
 export const movies = {
   list: (params, token) => {
     const query = new URLSearchParams(params).toString();
-    return request(`/api/movies?${query}`, { token });
+    return request(`/movies?${query}`, { token });
   },
   get: (id, token, options = {}) => {
     const query = options.refresh ? "?refresh=true" : "";
-    return request(`/api/movies/${id}${query}`, { token });
+    return request(`/movies/${id}${query}`, { token });
   },
-  topRating: (token) => request("/api/movies/rating", { token }),
-  topImdb: (token) => request("/api/movies/top-imdb", { token }),
+  topRating: (token) => request("/movies/rating", { token }),
+  topImdb: (token) => request("/movies/top-imdb", { token }),
   create: (payload, token) =>
-    request("/api/movies", { method: "POST", body: payload, token }),
+    request("/movies", { method: "POST", body: payload, token }),
   updateById: (id, payload, token) =>
-    request(`/api/movies/${id}`, { method: "PUT", body: payload, token }),
+    // <-- antes tenías `//movies/${id}`, ahora sólo uno
+    request(`/movies/${id}`, { method: "PUT", body: payload, token }),
   removeById: (id, token) =>
-    request(`/api/movies/${id}`, { method: "DELETE", token }),
+    // <-- y aquí igual, corregido
+    request(`/movies/${id}`, { method: "DELETE", token }),
 };
 
 export const profiles = {
-  list: (token) => request("/api/profiles", { token }),
+  // <-- antes era "//profiles", ahora un sólo slash
+  list: (token) => request("/profiles", { token }),
   create: (data, token) =>
-    request("/api/profiles", { method: "POST", body: data, token }),
+    request("/profiles", { method: "POST", body: data, token }),
   update: (id, data, token) =>
-    request(`/api/profiles/${id}`, { method: "PUT", body: data, token }),
+    request(`/profiles/${id}`, { method: "PUT", body: data, token }),
   remove: (id, token) =>
-    request(`/api/profiles/${id}`, { method: "DELETE", token }),
+    request(`/profiles/${id}`, { method: "DELETE", token }),
 };
 
 export const watchlist = {
   add: (profileId, itemId, token) =>
-    request(`/api/profiles/${profileId}/watchlist`, {
+    request(`/profiles/${profileId}/watchlist`, {
       method: "POST",
       body: { itemId },
       token,
     }),
   remove: (profileId, itemId, token) =>
-    request(`/api/profiles/${profileId}/watchlist/${itemId}`, {
+    request(`/profiles/${profileId}/watchlist/${itemId}`, {
       method: "DELETE",
       token,
     }),
