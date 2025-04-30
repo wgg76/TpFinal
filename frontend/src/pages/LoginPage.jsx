@@ -49,18 +49,18 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 md:px-8">
-  <div className="w-full max-w-md md:max-w-lg lg:max-w-xl">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 sm:px-8">
+  <div className="w-full max-w-xs sm:max-w-sm md:max-w-lg lg:max-w-xl">
     <form
       onSubmit={handleSubmit}
       className="bg-white p-4 sm:p-6 md:p-8 rounded shadow-lg w-full"
     >
-      <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 text-center">
+      <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mb-6 text-center">
         Iniciar Sesión
       </h2>
 
-      <div className="mb-4 sm:mb-6">
-        <label htmlFor="email" className="block mb-2 text-sm sm:text-base md:text-lg">
+      <div className="mb-4">
+        <label htmlFor="email" className="block mb-2 text-sm sm:text-base lg:text-lg">
           Email
         </label>
         <input
@@ -71,12 +71,12 @@ export default function LoginPage() {
           value={credentials.email}
           onChange={handleChange}
           required
-          className="w-full p-2 sm:p-3 md:p-4 text-sm sm:text-base md:text-lg rounded border focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="w-full p-2 sm:p-3 md:p-4 text-sm sm:text-base lg:text-lg rounded border focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
       </div>
 
-      <div className="mb-6 sm:mb-8">
-        <label htmlFor="password" className="block mb-2 text-sm sm:text-base md:text-lg">
+      <div className="mb-6">
+        <label htmlFor="password" className="block mb-2 text-sm sm:text-base lg:text-lg">
           Contraseña
         </label>
         <input
@@ -87,18 +87,18 @@ export default function LoginPage() {
           value={credentials.password}
           onChange={handleChange}
           required
-          className="w-full p-2 sm:p-3 md:p-4 text-sm sm:text-base md:text-lg rounded border focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="w-full p-2 sm:p-3 md:p-4 text-sm sm:text-base lg:text-lg rounded border focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
       </div>
 
       <button
         type="submit"
-        className="w-full py-2 sm:py-3 md:py-4 text-sm sm:text-base md:text-lg font-semibold rounded bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+        className="w-full py-2 sm:py-3 md:py-4 text-base sm:text-lg md:text-xl font-semibold rounded bg-blue-600 hover:bg-blue-700 text-white transition-colors"
       >
         Acceder
       </button>
 
-      <p className="mt-4 sm:mt-6 text-center text-xs sm:text-sm md:text-base">
+      <p className="mt-4 sm:mt-6 text-center text-sm sm:text-base md:text-lg">
         ¿No tienes cuenta?{" "}
         <Link to="/register" className="text-blue-600 hover:underline">
           Regístrate
@@ -107,6 +107,7 @@ export default function LoginPage() {
     </form>
   </div>
 </div>
+
 
   );
   
