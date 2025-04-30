@@ -19,7 +19,6 @@ export default function LoginPage() {
     e.preventDefault();
     try {
       // 1) Iniciar sesión y guardar token
-      console.log("🔥 API_BASE =", API_BASE);
       const res = await fetch(`${API_BASE}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -50,10 +49,17 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4 sm:p-8">
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-8 rounded shadow-md w-full max-w-md"
+        className="
+          bg-white 
+          p-6 sm:p-8 
+          rounded-lg 
+          shadow-md 
+          w-full 
+          max-w-full sm:max-w-md
+        "
       >
         <h2 className="text-2xl font-bold mb-6 text-center">Iniciar Sesión</h2>
 
@@ -69,7 +75,7 @@ export default function LoginPage() {
             value={credentials.email}
             onChange={handleChange}
             required
-            className="w-full p-2 border rounded mb-4"
+            className="w-full p-2 border rounded"
           />
         </div>
 
@@ -97,7 +103,7 @@ export default function LoginPage() {
         </button>
 
         <p className="mt-4 text-center">
-          ¿No tienes cuenta?{' '}
+          ¿No tienes cuenta?{" "}
           <Link to="/register" className="text-blue-500 hover:underline">
             Regístrate
           </Link>
