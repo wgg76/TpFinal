@@ -73,7 +73,7 @@ export default function SeriesForm({ editMode }) {
   };
 
   return (
-    <div className="max-w-md mx-auto p-4">
+    <div className="w-full max-w-xl mx-auto p-6">
       <h2 className="text-xl font-bold mb-4 text-center">
         {editMode ? "Editar Serie" : "Crear Nueva Serie"}
       </h2>

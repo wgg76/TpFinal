@@ -63,7 +63,7 @@ export default function MovieForm({ editMode }) {
   };
 
   return (
-    <div className="max-w-md mx-auto p-4">
+    <div className="w-full max-w-xl mx-auto p-6">
       <h2 className="text-xl font-bold mb-4">
         {editMode ? "Editar Película" : "Crear Nueva Película"}
       </h2>
