@@ -1,43 +1,44 @@
 // src/App.jsx
+import React from "react";
+import { Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import { SearchProvider } from "./context/SearchContext";
+import { ThemeProvider } from "./context/ThemeContext";
 
- import React from "react";
- import { Routes, Route } from "react-router-dom";
- import { AuthProvider } from "./context/AuthContext";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
 
- import { SearchProvider } from "./context/SearchContext";
- import { ThemeProvider } from "./context/ThemeContext";
-
- import Header from "./components/Header";
- import Footer from "./components/Footer";
-
+import Home from "./pages/Home";
+// IMPORTA HomePage si lo tienes en otro fichero, o usa directamente Home
  import Home from "./pages/Home";
- import LoginPage from "./pages/LoginPage";
- import Register from "./pages/Register";
- import ChooseProfile from "./pages/ChooseProfile";
- import ProfileForm from "./pages/ProfileForm";
- import MovieList from "./pages/MovieList";
- import MovieForm from "./pages/MovieForm";
- import MovieDetail from "./pages/MovieDetail";
- import SeriesList from "./pages/SeriesList";
- import SeriesForm from "./pages/SeriesForm";
- import SeriesDetail from "./pages/SeriesDetail";
- import WatchlistPage from "./pages/WatchlistPage";
- import RatingList from "./pages/RatingList";
- import NotFound from "./pages/NotFound";
 
- import PrivateRoute from "./components/PrivateRoute";
+import LoginPage from "./pages/LoginPage";
+import Register from "./pages/Register";
+import ChooseProfile from "./pages/ChooseProfile";
+import ProfileForm from "./pages/ProfileForm";
+import MovieList from "./pages/MovieList";
+import MovieForm from "./pages/MovieForm";
+import MovieDetail from "./pages/MovieDetail";
+import SeriesList from "./pages/SeriesList";
+import SeriesForm from "./pages/SeriesForm";
+import SeriesDetail from "./pages/SeriesDetail";
+import WatchlistPage from "./pages/WatchlistPage";
+import RatingList from "./pages/RatingList";
+import NotFound from "./pages/NotFound";
+
+import PrivateRoute from "./components/PrivateRoute";
 
 function App() {
-   return (
-     <div className="flex flex-col min-h-screen">
-       <Header />
-
-
-
+  return (
+    <div className="flex flex-col min-h-screen">
+      <Header />
       <main className="flex-grow">
-        <Routes>
+
+       <Routes>
           {/* 1) Página principal pública */}
           <Route path="/" element={<Home />} />
+         {/* Alias “/home” para cuando ya estés logueado */}
+         <Route path="/home" element={<Home />} />
 
           {/* 2) Rating (requiere solo login) */}
           <Route
@@ -53,7 +54,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<Register />} />
 
-          {/* 4) Perfiles (sin perfil creado aún) */}
+          {/* 4) Perfiles */}
           <Route
             path="/profiles"
             element={
@@ -157,7 +158,7 @@ function App() {
             }
           />
 
-          {/* 8) Catch all */}
+          {/* 8) Catch all: 404 de React */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
