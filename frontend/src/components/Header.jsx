@@ -138,14 +138,8 @@ const Header = () => {
               🎥 Mi Lista ({activeProfile.watchlist?.length || 0})
             </Link>
           )}
-          {!user ? (
-            <Link to="/login" className={btnStyle}>
-              Iniciar Sesión
-            </Link>
-          ) : (
-            <button onClick={handleLogout} className={btnStyle}>
-              Cerrar Sesión
-            </button>
+          {user && (
+            <button onClick={handleLogout} className={btnStyle}>Cerrar Sesión</button>
           )}
         </nav>
       )}
