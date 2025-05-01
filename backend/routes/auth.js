@@ -16,6 +16,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "tu-clave-secreta-super-segura";
  * Registro de usuario
  */
 authRouter.post("/register", async (req, res) => {
+  console.log("BODY EN REGISTER:", req.body);
   try {
     const { email, password, role } = req.body;
 
@@ -39,7 +40,7 @@ authRouter.post("/register", async (req, res) => {
     const newUser = new User({
       email: email.toLowerCase().trim(),
       password: hashed,
-      role: role || "user",
+      role: role || "standar",
     });
 
     await newUser.save();
