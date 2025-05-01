@@ -46,9 +46,9 @@ authRouter.post("/register", async (req, res) => {
     await newUser.save();
     res.status(201).json({ message: "Usuario registrado con éxito" });
   } catch (err) {
-    console.error("❌ Error en POST /auth/register:", err);
-    console.error("Error en /register:", err);
-    res.status(500).json({ error: "Error al registrar usuario" });
+    console.error("❌ Error en POST /auth/register:", err.message);
+    console.error(err.stack);
+    res.status(500).json({error: err.message});
   }
 });
 
