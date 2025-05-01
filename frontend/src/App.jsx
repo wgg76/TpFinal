@@ -8,9 +8,8 @@ import { ThemeProvider } from "./context/ThemeContext";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 
-import Home from "./pages/Home";
-// IMPORTA HomePage si lo tienes en otro fichero, o usa directamente Home
- import Home from "./pages/Home";
+
+import Home from "./pages/Home";            // <-- usá siempre este para ambas rutas
 
 import LoginPage from "./pages/LoginPage";
 import Register from "./pages/Register";
@@ -24,6 +23,7 @@ import SeriesForm from "./pages/SeriesForm";
 import SeriesDetail from "./pages/SeriesDetail";
 import WatchlistPage from "./pages/WatchlistPage";
 import RatingList from "./pages/RatingList";
+
 import NotFound from "./pages/NotFound";
 
 import PrivateRoute from "./components/PrivateRoute";
@@ -32,13 +32,13 @@ function App() {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      <main className="flex-grow">
 
-       <Routes>
-          {/* 1) Página principal pública */}
+      <main className="flex-grow">
+        <Routes>
+          {/* 1) Página pública */}
           <Route path="/" element={<Home />} />
-         {/* Alias “/home” para cuando ya estés logueado */}
-         <Route path="/home" element={<Home />} />
+          {/* alias “/home” que muestra lo mismo */}
+          <Route path="/home" element={<Home />} />
 
           {/* 2) Rating (requiere solo login) */}
           <Route
@@ -54,113 +54,113 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<Register />} />
 
-          {/* 4) Perfiles */}
-          <Route
-            path="/profiles"
-            element={
-              <PrivateRoute skipProfileCheck>
-                <ChooseProfile />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/profiles/new"
-            element={
-              <PrivateRoute skipProfileCheck>
-                <ProfileForm editMode={false} />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/profiles/edit/:id"
-            element={
-              <PrivateRoute skipProfileCheck>
-                <ProfileForm editMode={true} />
-              </PrivateRoute>
-            }
-          />
+           {/* 4) Perfiles (sin perfil creado aún) */}
+           <Route
+             path="/profiles"
+             element={
+               <PrivateRoute skipProfileCheck>
+                 <ChooseProfile />
+               </PrivateRoute>
+             }
+           />
+           <Route
+             path="/profiles/new"
+             element={
+               <PrivateRoute skipProfileCheck>
+                 <ProfileForm editMode={false} />
+               </PrivateRoute>
+             }
+           />
+           <Route
+             path="/profiles/edit/:id"
+             element={
+               <PrivateRoute skipProfileCheck>
+                 <ProfileForm editMode={true} />
+               </PrivateRoute>
+             }
+           />
 
-          {/* 5) Películas */}
-          <Route
-            path="/movies"
-            element={
-              <PrivateRoute>
-                <MovieList />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/movies/create"
-            element={
-              <PrivateRoute adminOnly>
-                <MovieForm editMode={false} />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/movies/edit/:id"
-            element={
-              <PrivateRoute adminOnly>
-                <MovieForm editMode={true} />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/movies/:id"
-            element={
-              <PrivateRoute>
-                <MovieDetail />
-              </PrivateRoute>
-            }
-          />
+           {/* 5) Películas */}
+           <Route
+             path="/movies"
+             element={
+               <PrivateRoute>
+                 <MovieList />
+               </PrivateRoute>
+             }
+           />
+           <Route
+             path="/movies/create"
+             element={
+               <PrivateRoute adminOnly>
+                 <MovieForm editMode={false} />
+               </PrivateRoute>
+             }
+           />
+           <Route
+             path="/movies/edit/:id"
+             element={
+               <PrivateRoute adminOnly>
+                 <MovieForm editMode={true} />
+               </PrivateRoute>
+             }
+           />
+           <Route
+             path="/movies/:id"
+             element={
+               <PrivateRoute>
+                 <MovieDetail />
+               </PrivateRoute>
+             }
+           />
 
-          {/* 6) Series */}
-          <Route
-            path="/series"
-            element={
-              <PrivateRoute>
-                <SeriesList />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/series/create"
-            element={
-              <PrivateRoute adminOnly>
-                <SeriesForm editMode={false} />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/series/edit/:id"
-            element={
-              <PrivateRoute adminOnly>
-                <SeriesForm editMode={true} />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/series/:id"
-            element={
-              <PrivateRoute>
-                <SeriesDetail />
-              </PrivateRoute>
-            }
-          />
+           {/* 6) Series */}
+           <Route
+             path="/series"
+             element={
+               <PrivateRoute>
+                 <SeriesList />
+               </PrivateRoute>
+             }
+           />
+           <Route
+             path="/series/create"
+             element={
+               <PrivateRoute adminOnly>
+                 <SeriesForm editMode={false} />
+               </PrivateRoute>
+             }
+           />
+           <Route
+             path="/series/edit/:id"
+             element={
+               <PrivateRoute adminOnly>
+                 <SeriesForm editMode={true} />
+               </PrivateRoute>
+             }
+           />
+           <Route
+             path="/series/:id"
+             element={
+               <PrivateRoute>
+                 <SeriesDetail />
+               </PrivateRoute>
+             }
+           />
 
-          {/* 7) Watchlist */}
-          <Route
-            path="/watchlist"
-            element={
-              <PrivateRoute>
-                <WatchlistPage />
-              </PrivateRoute>
-            }
-          />
+           {/* 7) Watchlist */}
+           <Route
+             path="/watchlist"
+             element={
+               <PrivateRoute>
+                 <WatchlistPage />
+               </PrivateRoute>
+             }
+           />
 
-          {/* 8) Catch all: 404 de React */}
+           {/* 8) Catch all */}
           <Route path="*" element={<NotFound />} />
-        </Routes>
+         </Routes>
       </main>
 
       <Footer />
