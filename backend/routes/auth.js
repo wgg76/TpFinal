@@ -36,11 +36,11 @@ authRouter.post("/register", async (req, res) => {
     // Hashear contraseña
     const hashed = await bcrypt.hash(password, 10);
 
-    // Crear usuario; si no se envía rol, por defecto "user"
+    // Crear usuario; si no se envía rol, por defecto "standar"
     const newUser = new User({
       email: email.toLowerCase().trim(),
       password: hashed,
-      role: role || "standar",
+      role: role || "user",
     });
 
     await newUser.save();
