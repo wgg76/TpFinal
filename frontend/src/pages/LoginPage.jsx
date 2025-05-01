@@ -7,6 +7,7 @@ import { AuthContext } from "../context/AuthContext";
 
 export default function LoginPage() {
   const [credentials, setCredentials] = useState({ email: "", password: "" });
+  const { email, password } = credentials;
   const navigate = useNavigate();
   const { login, setActiveProfile } = useContext(AuthContext);
 
