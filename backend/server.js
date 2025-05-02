@@ -19,11 +19,6 @@ const __dirname = path.dirname(__filename);
 app.use(express.json());
 app.use(cors());
 
-// Middleware de logging
-app.use((req, res, next) => {
-  next();
-});
-
 // Montar rutas API existentes
 import usersRouter from "./routes/users.js";
 import authRouter from "./routes/auth.js";
@@ -38,7 +33,7 @@ app.use("/api/series", moviesRouter);   // alias para series
 app.use("/api/users", usersRouter);
 app.use("/api/reports", reportsRouter);
 
-// Ruta raíz de la API (opcional)
+// Ruta raíz de la API
 app.get("/api", (req, res) => {
   res.send("API de Usuarios, Perfiles y Películas funcionando");
 });
@@ -46,29 +41,16 @@ app.get("/api", (req, res) => {
 // Ruta para servir JSON enriquecido con trailerUrl o fallback a original
 app.get("/api/movies-json", (req, res) => {
   console.log("🛠️  Petición a /api/movies-json recibida");
-  const candidatePaths = [
-    path.resolve(__dirname, "data/movies.withTrailers.json"),
-    path.resolve(__dirname, "data/movies.json")  // fallback directo en caso que withTrailers no exista
-  ];
-  let fileToServe;
-  for (const p of candidatePaths) {
-    if (fs.existsSync(p)) {
-      fileToServe = p;
-      break;
-    }
-  }
-  if (!fileToServe) {
-    console.warn("⚠️ movies.withTrailers.json no encontrado, usando movies.json");
-    const originalPaths = [
-      path.resolve(__dirname, "./data/movies.json"),
-      path.resolve(__dirname, "./backend/data/movies.json"),
-    ];
-    fileToServe = originalPaths.find(p => fs.existsSync(p));
-  }
+  const enrichedPath = path.resolve(__dirname, "./data/movies.withTrailers.json");
+  const originalPath = path.resolve(__dirname, "./data/movies.json");
+  const fileToServe = fs.existsSync(enrichedPath) ? enrichedPath : (fs.existsSync(originalPath) ? originalPath : null);
+
   console.log("🛠️  Sirviendo fichero:", fileToServe);
   if (!fileToServe) {
+    console.error("❌ No se encontró ningún JSON de películas para servir");
     return res.status(404).send("Not Found");
   }
+
   res.sendFile(fileToServe, (err) => {
     if (err) {
       console.error("❌ Error sirviendo", fileToServe, err);
