@@ -93,6 +93,7 @@ const Header = () => {
       toast.error("No se pudo descargar el reporte");
     }
   };
+
   return (
     <header className="bg-white dark:bg-[#0a0a23] text-gray-900 dark:text-yellow-400 py-4 px-6 shadow-md transition-colors duration-300">
       {/* Título */}
