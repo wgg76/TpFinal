@@ -41,16 +41,16 @@ app.get("/api", (req, res) => {
 
 // Ruta para servir JSON enriquecido con trailerUrl
 app.get("/api/movies-json", (req, res) => {
-     const enriched = path.resolve(__dirname, "./data/movies.withTrailers.json");
-     const original = path.resolve(__dirname, "./data/movies.json");
-     const fileToServe = fs.existsSync(enriched) ? enriched : original;
-     res.sendFile(fileToServe, (err) => {
-       if (err) {
-         console.error("❌ Error sirviendo", fileToServe, err);
-         res.status(500).send("Internal Server Error");
-       }
-     });
-   });
+  const enriched = path.resolve(__dirname, "./data/movies.withTrailers.json");
+  const original = path.resolve(__dirname, "./data/movies.json");
+  const fileToServe = fs.existsSync(enriched) ? enriched : original;
+  res.sendFile(fileToServe, (err) => {
+    if (err) {
+      console.error("❌ Error sirviendo", fileToServe, err);
+      res.status(500).send("Internal Server Error");
+    }
+  });
+});
 
 // Servir frontend Vite
 app.use(express.static(path.resolve(__dirname, "frontend/dist")));
