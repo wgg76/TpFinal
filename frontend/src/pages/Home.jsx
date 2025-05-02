@@ -19,7 +19,7 @@ export default function Home() {
   const [trailers, setTrailers] = useState([]);
 
   useEffect(() => {
-    fetch("/api/movies-json")
+    fetch("/movies.withTrailers.json")
       .then((res) => res.json())
       .then((data) => {
         // Filtrar solo items con trailerUrl válido (YouTube embed)
