@@ -21,7 +21,6 @@ app.use(cors());
 
 // Middleware de logging
 app.use((req, res, next) => {
-  // console.log(`→ Petición recibida: ${req.method} ${req.originalUrl}`);
   next();
 });
 
@@ -47,7 +46,6 @@ app.get("/api", (req, res) => {
 // Ruta para servir JSON enriquecido con trailerUrl o fallback a original
 app.get("/api/movies-json", (req, res) => {
   console.log("🛠️  Petición a /api/movies-json recibida");
-  // Intentamos varias rutas posibles para producción y local
   const candidatePaths = [
     path.resolve(__dirname, "./data/movies.withTrailers.json"),
     path.resolve(__dirname, "./backend/data/movies.withTrailers.json"),
@@ -60,7 +58,6 @@ app.get("/api/movies-json", (req, res) => {
     }
   }
   if (!fileToServe) {
-    // Fallback al movies.json original
     console.warn("⚠️ movies.withTrailers.json no encontrado, usando movies.json");
     const originalPaths = [
       path.resolve(__dirname, "./data/movies.json"),
@@ -78,7 +75,6 @@ app.get("/api/movies-json", (req, res) => {
       res.status(500).send("Internal Server Error");
     }
   });
-});
 });
 
 // Servir los archivos estáticos generados por Vite
