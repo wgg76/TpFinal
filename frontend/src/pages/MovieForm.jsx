@@ -44,23 +44,19 @@ export default function MovieForm({ editMode }) {
   }, [editMode, id, token, reset]);
 
   const onSubmit = async data => {
-    //console.log("🔄 Submitting data:", data);
-    try {
-      let result;
-      if (editMode) {
-        result = await movies.updateById(id, data, token);
-        toast.success("Película actualizada correctamente");
-      } else {
-        result = await movies.create(data, token);
-        toast.success("Película creada correctamente");
+      try {
+        if (editMode) {
+          await movies.updateById(id, data, token);
+          toast.success("Película actualizada correctamente");
+        } else {
+          await movies.create(data, token);
+          toast.success("Película creada correctamente");
+        }
+        setTimeout(() => navigate("/movies"), 1000);
+      } catch (err) {
+        toast.error(err.message || "Error al procesar la solicitud");
       }
-      //console.log("✅ API result:", result);
-      setTimeout(() => navigate("/movies"), 1000);
-    } catch (err) {
-      //console.error("❌ Error al enviar formulario:", err);
-      toast.error(err.message || "Error al procesar la solicitud");
-    }
-  };
+    };
 
   return (
     <div className="w-full max-w-xl mx-auto p-6">
