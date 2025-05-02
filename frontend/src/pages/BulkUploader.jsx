@@ -57,15 +57,15 @@ export default function BulkUploader() {
         });
 
         if (!postRes.ok) {
-          console.error(`❌ Error cargando '${movie.Title}': ${postRes.status}`);
+          //console.error(`❌ Error cargando '${movie.Title}': ${postRes.status}`);
         } else {
-          console.log(`✅ Cargado: ${movie.Title}`);
+          //console.log(`✅ Cargado: ${movie.Title}`);
         }
       }
 
       toast.success("Carga masiva finalizada ✅");
     } catch (err) {
-      console.error("❌ Error en carga masiva:", err);
+      //console.error("❌ Error en carga masiva:", err);
       toast.error("Error al realizar la carga masiva");
     }
   };

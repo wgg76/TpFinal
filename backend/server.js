@@ -13,7 +13,7 @@ import moviesRouter from "./routes/Movies.js";
 import reportsRouter from "./routes/reports.js";
 
 dotenv.config();
-console.log("🚀 OMDB_API_KEY =", process.env.OMDB_API_KEY);
+//console.log("🚀 OMDB_API_KEY =", process.env.OMDB_API_KEY);
 
 const app = express();
 
@@ -27,7 +27,7 @@ app.use(cors());
 
 // Middleware de logging
 app.use((req, res, next) => {
-  console.log(`→ Petición recibida: ${req.method} ${req.originalUrl}`);
+  //console.log(`→ Petición recibida: ${req.method} ${req.originalUrl}`);
   next();
 });
 
@@ -55,20 +55,20 @@ app.get(/^(?!\/api).*/, (_req, res) => {
 // Conexión a la base de datos y arranque del servidor
 const mongoURI = process.env.MONGO_URI;
 if (!mongoURI) {
-  console.error("❌ ERROR: No se encontró MONGO_URI en el archivo .env");
+  //console.error("❌ ERROR: No se encontró MONGO_URI en el archivo .env");
   process.exit(1);
 }
 
 mongoose
   .connect(mongoURI)
   .then(() => {
-    console.log("✅ Conectado a MongoDB");
+    // console.log("✅ Conectado a MongoDB");
     const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () =>
-      console.log(`🚀 Servidor corriendo en el puerto ${PORT}`)
-    );
+    app.listen(PORT, () => {
+      // console.log(`🚀 Servidor corriendo en el puerto ${PORT}`);
+    });
   })
   .catch((err) => {
-    console.error("❌ Error al conectar a MongoDB:", err);
+    // console.error("❌ Error al conectar a MongoDB:", err);
     process.exit(1);
   });

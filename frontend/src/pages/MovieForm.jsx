@@ -44,7 +44,7 @@ export default function MovieForm({ editMode }) {
   }, [editMode, id, token, reset]);
 
   const onSubmit = async data => {
-    console.log("🔄 Submitting data:", data);
+    //console.log("🔄 Submitting data:", data);
     try {
       let result;
       if (editMode) {
@@ -54,10 +54,10 @@ export default function MovieForm({ editMode }) {
         result = await movies.create(data, token);
         toast.success("Película creada correctamente");
       }
-      console.log("✅ API result:", result);
+      //console.log("✅ API result:", result);
       setTimeout(() => navigate("/movies"), 1000);
     } catch (err) {
-      console.error("❌ Error al enviar formulario:", err);
+      //console.error("❌ Error al enviar formulario:", err);
       toast.error(err.message || "Error al procesar la solicitud");
     }
   };
