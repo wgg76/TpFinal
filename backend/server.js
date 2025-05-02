@@ -4,8 +4,8 @@ import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 import path from "path";
-import { fileURLToPath } from "url";
 import fs from "fs";
+import { fileURLToPath } from "url";
 
 dotenv.config();
 
@@ -15,12 +15,17 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Middleware
+// Middleware para parsear JSON y habilitar CORS
 app.use(express.json());
 app.use(cors());
-app.use((req, res, next) => { next(); });
 
-// Rutas API
+// Middleware de logging
+app.use((req, res, next) => {
+  // console.log(`→ Petición recibida: ${req.method} ${req.originalUrl}`);
+  next();
+});
+
+// Montar rutas API existentes
 import usersRouter from "./routes/users.js";
 import authRouter from "./routes/auth.js";
 import profilesRouter from "./routes/profiles.js";
@@ -30,20 +35,22 @@ import reportsRouter from "./routes/reports.js";
 app.use("/api/auth", authRouter);
 app.use("/api/profiles", profilesRouter);
 app.use("/api/movies", moviesRouter);
-app.use("/api/series", moviesRouter);
+app.use("/api/series", moviesRouter);   // alias para series
 app.use("/api/users", usersRouter);
 app.use("/api/reports", reportsRouter);
 
-// Ruta raíz API
+// Ruta raíz de la API (opcional)
 app.get("/api", (req, res) => {
   res.send("API de Usuarios, Perfiles y Películas funcionando");
 });
 
-// Ruta para servir JSON enriquecido con trailerUrl
+// Ruta para servir JSON enriquecido con trailerUrl o fallback a original
 app.get("/api/movies-json", (req, res) => {
+  console.log("🛠️  Petición a /api/movies-json recibida");
   const enriched = path.resolve(__dirname, "./data/movies.withTrailers.json");
   const original = path.resolve(__dirname, "./data/movies.json");
   const fileToServe = fs.existsSync(enriched) ? enriched : original;
+  console.log("🛠️  Sirviendo fichero:", fileToServe);
   res.sendFile(fileToServe, (err) => {
     if (err) {
       console.error("❌ Error sirviendo", fileToServe, err);
@@ -52,25 +59,31 @@ app.get("/api/movies-json", (req, res) => {
   });
 });
 
-// Servir frontend Vite
+// Servir los archivos estáticos generados por Vite
 app.use(express.static(path.resolve(__dirname, "frontend/dist")));
+
+// Fallback: si NO es ruta /api/*, devolver index.html
 app.get(/^(?!\/api).*/, (_req, res) => {
   res.sendFile(path.resolve(__dirname, "frontend/dist/index.html"));
 });
 
-// Conexión Mongo
+// Conexión a la base de datos y arranque del servidor
 const mongoURI = process.env.MONGO_URI;
-if (!mongoURI) process.exit(1);
+if (!mongoURI) {
+  console.error("❌ ERROR: No se encontró MONGO_URI en el archivo .env");
+  process.exit(1);
+}
 
 mongoose
   .connect(mongoURI)
   .then(() => {
+    console.log("✅ Conectado a MongoDB");
     const PORT = process.env.PORT || 5000;
     app.listen(PORT, () => {
       console.log(`🚀 Servidor corriendo en el puerto ${PORT}`);
     });
   })
   .catch(err => {
-    console.error("Error conectando a MongoDB:", err);
+    console.error("❌ Error al conectar a MongoDB:", err);
     process.exit(1);
   });
