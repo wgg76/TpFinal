@@ -68,7 +68,7 @@ mongoose
       // console.log(`🚀 Servidor corriendo en el puerto ${PORT}`);
     });
   })
-  .catch((err) => {
+  .catch(() => {
     // console.error("❌ Error al conectar a MongoDB:", err);
     process.exit(1);
   });
