@@ -47,8 +47,8 @@ app.get("/api", (req, res) => {
 app.get("/api/movies-json", (req, res) => {
   console.log("🛠️  Petición a /api/movies-json recibida");
   const candidatePaths = [
-    path.resolve(__dirname, "./data/movies.withTrailers.json"),
-    path.resolve(__dirname, "./backend/data/movies.withTrailers.json"),
+    path.resolve(__dirname, "data/movies.withTrailers.json"),
+    path.resolve(__dirname, "data/movies.json")  // fallback directo en caso que withTrailers no exista
   ];
   let fileToServe;
   for (const p of candidatePaths) {
