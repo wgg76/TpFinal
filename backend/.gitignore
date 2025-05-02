@@ -27,7 +27,7 @@ dist-ssr
 /frontend/.env
 
 # Generated data and scripts
-/backend/data/movies.withTrailers.json
+#/backend/data/movies.withTrailers.json
 /backend/scripts/
 
 # Vite environment examples
