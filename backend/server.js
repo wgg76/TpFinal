@@ -47,16 +47,38 @@ app.get("/api", (req, res) => {
 // Ruta para servir JSON enriquecido con trailerUrl o fallback a original
 app.get("/api/movies-json", (req, res) => {
   console.log("🛠️  Petición a /api/movies-json recibida");
-  const enriched = path.resolve(__dirname, "./data/movies.withTrailers.json");
-  const original = path.resolve(__dirname, "./data/movies.json");
-  const fileToServe = fs.existsSync(enriched) ? enriched : original;
+  // Intentamos varias rutas posibles para producción y local
+  const candidatePaths = [
+    path.resolve(__dirname, "./data/movies.withTrailers.json"),
+    path.resolve(__dirname, "./backend/data/movies.withTrailers.json"),
+  ];
+  let fileToServe;
+  for (const p of candidatePaths) {
+    if (fs.existsSync(p)) {
+      fileToServe = p;
+      break;
+    }
+  }
+  if (!fileToServe) {
+    // Fallback al movies.json original
+    console.warn("⚠️ movies.withTrailers.json no encontrado, usando movies.json");
+    const originalPaths = [
+      path.resolve(__dirname, "./data/movies.json"),
+      path.resolve(__dirname, "./backend/data/movies.json"),
+    ];
+    fileToServe = originalPaths.find(p => fs.existsSync(p));
+  }
   console.log("🛠️  Sirviendo fichero:", fileToServe);
+  if (!fileToServe) {
+    return res.status(404).send("Not Found");
+  }
   res.sendFile(fileToServe, (err) => {
     if (err) {
       console.error("❌ Error sirviendo", fileToServe, err);
       res.status(500).send("Internal Server Error");
     }
   });
+});
 });
 
 // Servir los archivos estáticos generados por Vite
