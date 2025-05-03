@@ -8,67 +8,75 @@ import { toast } from "react-toastify";
 
 export default function WatchlistPage() {
   const navigate = useNavigate();
-  const { token, user, activeProfile, removeFromWatchlist } =
-    useContext(AuthContext);
+  const { token, activeProfile, user, removeFromWatchlist } = useContext(AuthContext);
 
-  const [profiles, setProfiles] = useState([]);           // TODOS los perfiles (solo admin)
-  const [selectedProfileId, setSelectedProfileId] = useState(
-    activeProfile?._id ?? null
-  );
-  const [items, setItems] = useState([]);                 // películas cargadas
+  const [profiles, setProfiles] = useState([]);              // Para admin: lista de perfiles
+  const [selectedProfileId, setSelectedProfileId] = useState(null);
+  const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 1) Si el admin, cargar TODOS los perfiles
+  // ① Si soy admin, cargo todos los perfiles para el <select>
   useEffect(() => {
     if (user?.role === "admin") {
-      api.profiles.list(token)
+      api.profiles
+        .list(token)
         .then((plist) => {
           setProfiles(plist);
-          // si no hay ninguno seleccionado, selecciona el primero
-          if (!selectedProfileId && plist.length > 0) {
-            setSelectedProfileId(plist[0]._id);
-          }
+          setSelectedProfileId(plist[0]?._id || null);
         })
-        .catch(() => toast.error("No se pudo cargar la lista de perfiles"));
+        .catch(() => toast.error("Error cargando perfiles"))
+        .finally(() => setLoading(false));
+    } else {
+      setSelectedProfileId(activeProfile?._id);
+      setLoading(false);
     }
-  }, [user, token]);
+  }, [user, token, activeProfile]);
 
-  // 2) Cargar watchlist cada vez que cambie selectedProfileId
+  // ② Siempre que cambie el perfil seleccionado, cargo su watchlist
   useEffect(() => {
-    const pid = user?.role === "admin" ? selectedProfileId : activeProfile?._id;
-    if (!pid) {
-      navigate("/profiles");
-      return;
-    }
+    if (!selectedProfileId) return;
     setLoading(true);
     api.profiles
-      .getWatchlist(pid, token)
+      .getWatchlist(selectedProfileId, token)
       .then((ids) =>
         Promise.all(
-          ids.map((movieId) =>
-            api.movies.get(movieId, token, { refresh: true }).catch(() => null)
-          )
+          ids.map((id) => api.movies.get(id, token, { refresh: true }).catch(() => null))
         )
       )
       .then((movies) => setItems(movies.filter(Boolean)))
       .catch(() => toast.error("Error cargando favoritos"))
       .finally(() => setLoading(false));
-  }, [selectedProfileId, activeProfile, user, token, navigate]);
+  }, [selectedProfileId, token]);
 
-  // Eliminar un solo favorito (igual que antes)
-  const handleRemove = async (movieId) => { /* ... */ };
-  const handleClearAll = async () => { /* ... */ };
+  // ③ Función de borrado, reutiliza removeFromWatchlist del contexto
+  const handleRemove = async (id) => {
+    const { isConfirmed } = await Swal.fire({
+      title: "¿Eliminar favorito?",
+      text: "Esta acción no se puede deshacer.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, eliminar",
+    });
+    if (!isConfirmed) return;
+    await removeFromWatchlist(id);
+    setItems((prev) => prev.filter((m) => m._id !== id));
+    toast.info("Favorito eliminado");
+  };
+
+  if (loading) return <p className="p-4">Cargando…</p>;
+  if (!selectedProfileId) return <p className="p-4">Selecciona un perfil.</p>;
 
   return (
     <div className="max-w-6xl mx-auto p-6">
-      {/* 0) Si admin, mostrar selector de perfiles */}
-      {user?.role === "admin" && (
-        <div className="mb-4">
-          <label className="mr-2 font-semibold">Ver watchlist de:</label>
+      <div className="flex items-center justify-between mb-4">
+        <button onClick={() => navigate(-1)} className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+          ← Volver
+        </button>
+        {user?.role === "admin" && (
           <select
+            className="border p-2 rounded"
             value={selectedProfileId}
             onChange={(e) => setSelectedProfileId(e.target.value)}
-            className="p-2 border rounded"
           >
             {profiles.map((p) => (
               <option key={p._id} value={p._id}>
@@ -76,51 +84,24 @@ export default function WatchlistPage() {
               </option>
             ))}
           </select>
-        </div>
-      )}
-
-      {/* Botones Volver / Borrar */}
-      <div className="flex items-center justify-between mb-4">
-        <button
-          onClick={() => navigate(-1)}
-          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
-        >
-          ← Volver
-        </button>
-        <button
-          onClick={handleClearAll}
-          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
-        >
-          Borrar todo
-        </button>
+        )}
       </div>
 
-      {/* Título indicando de quién es la lista */}
       <h2 className="text-2xl font-bold mb-6">
-        Watchlist de{" "}
-        {user?.role === "admin"
-          ? profiles.find((p) => p._id === selectedProfileId)?.name || "—"
-          : activeProfile?.name}
-        {" "}
-        ({items.length})
+        Lista de Favoritos
       </h2>
 
-      {/* Resto del render idéntico a antes */}
-      {loading ? (
-        <p className="p-4">Cargando favoritos…</p>
-      ) : items.length > 0 ? (
+      {items.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {items.map((movie) => (
-            <div key={movie._id} className="bg-white rounded shadow p-4">
-              <Link to={`/movies/${movie._id}`} className="block mb-2">
+            <div key={movie._id} className="bg-white rounded shadow p-4 flex flex-col">
+              <Link to={`/movies/${movie._id}`} className="flex-grow">
                 <img
                   src={movie.Poster}
                   alt={movie.Title}
-                  className="w-full h-48 object-cover rounded"
+                  className="w-full h-48 object-cover rounded mb-2"
                 />
-                <h3 className="font-semibold text-lg mt-2">
-                  {movie.Title}
-                </h3>
+                <h3 className="font-semibold text-lg">{movie.Title}</h3>
               </Link>
               <button
                 onClick={() => handleRemove(movie._id)}
@@ -132,7 +113,7 @@ export default function WatchlistPage() {
           ))}
         </div>
       ) : (
-        <p className="p-4">Aún no tiene favoritos.</p>
+        <p className="p-4">No hay favoritos.</p>
       )}
     </div>
   );
