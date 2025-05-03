@@ -59,18 +59,25 @@ export default function SeriesForm({ editMode }) {
   const onSubmit = async (formData) => {
     try {
       if (editMode) {
-        await api.movies.updateById(id, formData, token);
+        await api.series.updateById(id, formData, token);
         toast.success("Serie actualizada exitosamente");
       } else {
-        await api.movies.create({ ...formData, Type: "series" }, token);
+        await api.series.create({ ...formData, Type: "series" }, token);
         toast.success("Serie creada exitosamente");
       }
-      navigate("/api/series");
+      // Navegar al listado de series
+      navigate("/series");
     } catch (err) {
       console.error(err);
-      toast.error(err.message || (editMode ? "Error al actualizar la serie" : "Error al crear la serie"));
+      toast.error(
+        err.message ||
+          (editMode
+            ? "Error al actualizar la serie"
+            : "Error al crear la serie")
+      );
     }
   };
+  
 
   return (
     <div className="w-full max-w-xl mx-auto p-6">

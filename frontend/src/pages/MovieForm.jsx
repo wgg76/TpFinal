@@ -44,7 +44,7 @@ export default function MovieForm({ editMode }) {
     }
   }, [editMode, id, token, reset]);
 
-  const onSubmit = async data => {
+  const onSubmit = async (data) => {
     try {
       if (editMode) {
         await movies.updateById(id, data, token);
@@ -53,13 +53,12 @@ export default function MovieForm({ editMode }) {
         await movies.create(data, token);
         toast.success("Película creada correctamente");
       }
-      // Navegamos a /movies, no a /api/movies
-      setTimeout(() => navigate("/movies"), 1000);
+      // Navegar al listado de películas
+      navigate("/movies");
     } catch (err) {
       toast.error(err.message || "Error al procesar la solicitud");
     }
   };
-
   return (
     <div className="w-full max-w-xl mx-auto p-6">
       <h2 className="text-xl font-bold mb-4">
