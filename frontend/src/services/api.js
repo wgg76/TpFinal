@@ -83,6 +83,8 @@ export const profiles = {
     request(`/api/profiles/${id}`, { method: "PUT", body: data, token }),
   remove: (id, token) =>
     request(`/api/profiles/${id}`, { method: "DELETE", token }),
+  getWatchlist: (profileId, token) =>
+    request(`/api/profiles/${profileId}/watchlist`, { token }),
 };
 
 export const watchlist = {

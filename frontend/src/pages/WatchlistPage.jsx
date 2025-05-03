@@ -20,15 +20,15 @@ const WatchlistPage = () => {
     }
     (async () => {
       try {
-        const movies = await Promise.all(
-          (activeProfile.watchlist || []).map((movieId) =>
-            api.movies
-              .get(movieId, token, { refresh: true })
-              .catch(() => null)
+        // 1) obtenemos solo la lista de IDs
+        const ids = await api.profiles.getWatchlist(activeProfile._id, token);
+        // 2) luego traemos detalle de cada uno
+        const items = await Promise.all(
+          ids.map((id) =>
+            api.movies.get(id, token, { refresh: true }).catch(() => null)
           )
         );
-        // Filtramos los null en caso de error en alguna llamada
-        setItems(movies.filter(Boolean));
+        setItems(items.filter(Boolean));
       } catch {
         toast.error("Error cargando favoritos");
       } finally {
