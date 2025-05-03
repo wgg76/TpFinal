@@ -33,7 +33,7 @@ function MovieEdit() {
     (async () => {
       try {
         // Construimos la URL usando VITE_API_URL en prod o el proxy de Vite en dev
-        const res = await fetch(`${API_BASE}/movies/${id}`, {
+        const res = await fetch(`${API_BASE}/api/movies/${id}`, {
           headers: token
             ? { Authorization: `Bearer ${token}` }
             : undefined,
@@ -89,7 +89,7 @@ function MovieEdit() {
         throw new Error("Error al actualizar la película");
       }
       toast.success("Película actualizada con éxito");
-      navigate("/movies");
+      navigate("/api/movies");
     } catch {
       toast.error("No se pudo actualizar la película");
     }

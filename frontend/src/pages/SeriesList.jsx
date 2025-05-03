@@ -34,6 +34,7 @@ export default function SeriesList() {
   useEffect(() => {
     let mounted = true;
     setLoading(true);
+
     (async () => {
       try {
         const params = {
@@ -44,10 +45,15 @@ export default function SeriesList() {
           ...(yearFromFilter && { yearFrom: yearFromFilter }),
           ...(yearToFilter && { yearTo: yearToFilter }),
         };
-        const { movies: base, total } = await api.movies.list(params, token);
+
+        // 1) Lista y detalle de SERIES en lugar de MOVIES
+        const { movies: base, total } = await api.series.list(params, token);
         const detailed = await Promise.all(
-          base.map((s) => api.movies.get(`${s._id ?? s.imdbID}?skipCount=true`, token))
+          base.map((s) =>
+            api.series.get(`${s._id ?? s.imdbID}?skipCount=true`, token)
+          )
         );
+
         if (!mounted) return;
         setSeries(detailed);
         setTotalSeries(total);
@@ -59,7 +65,10 @@ export default function SeriesList() {
         mounted && setLoading(false);
       }
     })();
-    return () => { mounted = false; };
+
+    return () => {
+      mounted = false;
+    };
   }, [currentPage, token, minRatingFilter, yearFromFilter, yearToFilter]);
 
   const isKid = activeProfile?.type === "child";
@@ -67,8 +76,10 @@ export default function SeriesList() {
     .filter((s) => s.Title.toLowerCase().includes(searchTerm.toLowerCase()))
     .filter((s) => (isKid ? isKidSafe(s.Rated, activeProfile.age) : true));
 
-  if (loading) return <p className="text-center py-10 text-white">Cargando…</p>;
-  if (error)   return <p className="text-center py-10 text-red-500">{error}</p>;
+  if (loading)
+    return <p className="text-center py-10 text-white">Cargando…</p>;
+  if (error)
+    return <p className="text-center py-10 text-red-500">{error}</p>;
 
   const baseBtn =
     "px-4 py-2 rounded-lg shadow transition flex items-center justify-center";
@@ -84,7 +95,6 @@ export default function SeriesList() {
       style={{ backgroundImage: `url(${background})` }}
     >
       <div className="container mx-auto px-4">
-
         {/* Encabezado con botón de filtros */}
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-4xl font-bold text-yellow-600">
@@ -183,7 +193,9 @@ export default function SeriesList() {
                 <h2 className="text-lg font-semibold mb-1">
                   {serie.Title}
                 </h2>
-                <p className="text-sm opacity-80 mb-2">Año: {serie.Year}</p>
+                <p className="text-sm opacity-80 mb-2">
+                  Año: {serie.Year}
+                </p>
                 {serie.imdbRating && (
                   <p className="text-sm mb-2">
                     IMDb: {serie.imdbRating} ({serie.imdbVotes} votos)
@@ -191,19 +203,28 @@ export default function SeriesList() {
                 )}
 
                 <div className="mt-auto flex flex-col gap-2 pt-4">
-                  <Link to={`/series/${serie._id ?? serie.imdbID}`} className={btnStyle}>
+                  <Link
+                    to={`/series/${serie._id ?? serie.imdbID}`}
+                    className={btnStyle}
+                  >
                     Detalle
                   </Link>
-                  {activeProfile?.watchlist?.includes(serie._id) ? (
+                  {activeProfile?.watchlist?.includes(
+                    serie._id ?? serie.imdbID
+                  ) ? (
                     <button
-                      onClick={() => removeFromWatchlist(serie._id)}
+                      onClick={() =>
+                        removeFromWatchlist(serie._id ?? serie.imdbID)
+                      }
                       className={btnStyle}
                     >
                       Quitar de Favoritos
                     </button>
                   ) : (
                     <button
-                      onClick={() => addToWatchlist(serie._id)}
+                      onClick={() =>
+                        addToWatchlist(serie._id ?? serie.imdbID)
+                      }
                       className={btnStyle}
                     >
                       Añadir a Favoritos
@@ -229,7 +250,7 @@ export default function SeriesList() {
                             confirmButtonText: "Sí, eliminar",
                           }).then((result) => {
                             if (result.isConfirmed) {
-                              api.movies
+                              api.series
                                 .removeById(serie._id, token)
                                 .then(() =>
                                   setSeries((prev) =>

@@ -20,7 +20,7 @@ export default function LoginPage() {
     e.preventDefault();
     try {
       // 1) Iniciar sesión y guardar token
-      const res = await fetch(`${API_BASE}/auth/login`, {
+      const res = await fetch(`${API_BASE}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -31,7 +31,7 @@ export default function LoginPage() {
       toast.success("Inicio de sesión exitoso");
 
       // 2) Obtener perfiles existentes
-      const perfRes = await fetch(`${API_BASE}/profiles`, {
+      const perfRes = await fetch(`${API_BASE}/api/profiles`, {
         headers: { Authorization: `Bearer ${data.token}` },
       });
       const perfiles = perfRes.ok ? await perfRes.json() : [];
@@ -69,7 +69,7 @@ export default function LoginPage() {
               name="email"
               id="email"
               placeholder="usuario@ejemplo.com"
-              value={credentials.email}
+              value={email}
               onChange={handleChange}
               required
               className="w-full p-3 text-base sm:text-lg rounded border focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -85,7 +85,7 @@ export default function LoginPage() {
               name="password"
               id="password"
               placeholder="••••••••"
-              value={credentials.password}
+              value={password}
               onChange={handleChange}
               required
               className="w-full p-3 text-base sm:text-lg rounded border focus:outline-none focus:ring-2 focus:ring-blue-400"

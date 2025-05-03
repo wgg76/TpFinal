@@ -6,7 +6,10 @@ import { toast } from "react-toastify";
 import Background from "../assets/descarga.jpeg";
 import { AuthContext } from "../context/AuthContext";
 
-const API_BASE = import.meta.env.VITE_API_URL || "/api";
+//console.log("→ import.meta.env:", import.meta.env);
+const API_BASE = import.meta.env.VITE_API_URL;
+//console.log("→ API_BASE:", API_BASE);
+
 
 export default function MovieDetail() {
   const { id } = useParams();
@@ -29,9 +32,11 @@ export default function MovieDetail() {
     (async () => {
       try {
         const isImdb = /^tt\d+$/.test(id);
+        // <-- Prefijo /api añadido aquí:
         const endpoint = isImdb
-          ? `${API_BASE}/movies/imdb/${id}`
-          : `${API_BASE}/movies/${id}`;
+          ? `${API_BASE}/api/movies/imdb/${id}`
+          : `${API_BASE}/api/movies/${id}`;
+        //console.log("→ Fetching Movie:", endpoint);
 
         const res = await fetch(endpoint, {
           headers: token

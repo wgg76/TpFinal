@@ -34,7 +34,7 @@ function SeriesEdit() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch(`${API_BASE}/movies/${id}`, {
+        const res = await fetch(`${API_BASE}/api/movies/${id}`, {
           method: 'GET',
           cache: 'no-store',  // deshabilita caché del navegador
           headers: token
@@ -89,7 +89,7 @@ function SeriesEdit() {
       });
       if (!response.ok) throw new Error('Error al actualizar');
       toast.success('Serie actualizada con éxito');
-      navigate('/series');
+      navigate('/api/series');
     } catch {
       
       toast.error('No se pudo actualizar la serie');

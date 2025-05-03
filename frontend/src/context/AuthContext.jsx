@@ -24,8 +24,7 @@ export function AuthProvider({ children }) {
     setToken(null);
     setUser(null);
     setActiveProfile(null);
-    navigate("/login");
-  }, [navigate]);
+  }, []);
 
   useEffect(() => {
     const savedToken = localStorage.getItem("token");

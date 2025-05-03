@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import Background from "../assets/descarga.jpeg";
 import { AuthContext } from "../context/AuthContext";
 
-const API_BASE = import.meta.env.VITE_API_URL || "/api";
+const API_BASE = import.meta.env.VITE_API_URL;
 
 export default function SeriesDetail() {
   const { id } = useParams();
@@ -29,9 +29,11 @@ export default function SeriesDetail() {
     (async () => {
       try {
         const isImdb = /^tt\d+$/.test(id);
+        // Aquí añadimos el prefijo /api para apuntar al backend
         const endpoint = isImdb
-          ? `${API_BASE}/series/imdb/${id}`
-          : `${API_BASE}/series/${id}`;
+          ? `${API_BASE}/api/series/imdb/${id}`
+          : `${API_BASE}/api/series/${id}`;
+        //console.log("→ Fetching Serie:", endpoint);
 
         const res = await fetch(endpoint, {
           headers: token

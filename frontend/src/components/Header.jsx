@@ -9,8 +9,7 @@ import Swal from "sweetalert2";
 import { ThemeContext } from '../context/ThemeContext';
 import { toast } from "react-toastify";
 
-// ✏️ Asegúrate de tener en tu .env:
-// VITE_API_URL=https://tpfinal-7qos.onrender.com/api
+
 const API_BASE = import.meta.env.VITE_API_URL || "";
 
 const Header = () => {
@@ -32,9 +31,13 @@ const Header = () => {
   const isMoviesPage = pathname.startsWith("/movies");
   const isSeriesPage = pathname.startsWith("/series");
 
+
+
   const handleLogout = () => {
+    // 1) Limpiamos token y perfil  
     logout();
-    navigate("/home");
+    // 2) Forzamos recarga completa en la raíz  
+    window.location.replace("/");
   };
 
   const handleSeed = async () => {
@@ -66,7 +69,7 @@ const Header = () => {
   const handleReport = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`${API_BASE}/reports/views`, {
+      const res = await fetch(`${API_BASE}/api/reports/views`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error("No autorizado o error en servidor");

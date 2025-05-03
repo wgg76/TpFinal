@@ -67,7 +67,7 @@ const MovieCreate = () => {
         (res) => res.json()
       );
       setMovies(updatedMovies);
-      navigate("/movies");
+      navigate("/api/movies");
     } catch (error) {
       console.error("❌ Error al crear:", error);
       toast.error("No se pudo crear la película");

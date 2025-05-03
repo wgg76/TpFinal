@@ -9,6 +9,7 @@ async function request(path, { method = "GET", body, token } = {}) {
   const headers = { "Content-Type": "application/json" };
   if (token) headers.Authorization = `Bearer ${token}`;
 
+  //console.log("→ Fetching:", `${API_URL}${path}`);
   const res = await fetch(`${API_URL}${path}`, {
     method,
     headers,
@@ -22,12 +23,12 @@ async function request(path, { method = "GET", body, token } = {}) {
 
 export const auth = {
   register: (email, password, role) =>
-    request("/auth/register", {
+    request("/api/auth/register", {
       method: "POST",
       body: { email, password, role },
     }),
   login: (email, password) =>
-    request("/auth/login", {
+    request("/api/auth/login", {
       method: "POST",
       body: { email, password },
     }),
@@ -36,47 +37,64 @@ export const auth = {
 export const movies = {
   list: (params, token) => {
     const query = new URLSearchParams(params).toString();
-    return request(`/movies?${query}`, { token });
+    return request(`/api/movies?${query}`, { token });
   },
   get: (id, token, options = {}) => {
     const query = options.refresh ? "?refresh=true" : "";
-    return request(`/movies/${id}${query}`, { token });
+    return request(`/api/movies/${id}${query}`, { token });
   },
-  topRating: (token) => request("/movies/rating", { token }),
-  topImdb: (token) => request("/movies/top-imdb", { token }),
+  topRating: (token) => request("/api/movies/rating", { token }),
+  topImdb: (token) => request("/api/movies/top-imdb", { token }),
   create: (payload, token) =>
-    request("/movies", { method: "POST", body: payload, token }),
+    request("/api/movies", { method: "POST", body: payload, token }),
   updateById: (id, payload, token) =>
-    // <-- antes tenías `//movies/${id}`, ahora sólo uno
-    request(`/movies/${id}`, { method: "PUT", body: payload, token }),
+    request(`/api/movies/${id}`, { method: "PUT", body: payload, token }),
   removeById: (id, token) =>
-    // <-- y aquí igual, corregido
-    request(`/movies/${id}`, { method: "DELETE", token }),
+    request(`/api/movies/${id}`, { method: "DELETE", token }),
+};
+
+// Añade este bloque para series, espejo de movie pero apuntando a /api/series
+export const series = {
+  list: (params, token) => {
+    const query = new URLSearchParams(params).toString();
+    return request(`/api/series?${query}`, { token });
+  },
+  get: (id, token, options = {}) => {
+    const query = options.refresh ? "?refresh=true" : "";
+    return request(`/api/series/${id}${query}`, { token });
+  },
+  topRating: (token) => request("/api/series/rating", { token }),
+  topImdb: (token) => request("/api/series/top-imdb", { token }),
+  create: (payload, token) =>
+    request("/api/series", { method: "POST", body: payload, token }),
+  updateById: (id, payload, token) =>
+    request(`/api/series/${id}`, { method: "PUT", body: payload, token }),
+  removeById: (id, token) =>
+    request(`/api/series/${id}`, { method: "DELETE", token }),
 };
 
 export const profiles = {
-  // <-- antes era "//profiles", ahora un sólo slash
-  list: (token) => request("/profiles", { token }),
+  list: (token) => request("/api/profiles", { token }),
   create: (data, token) =>
-    request("/profiles", { method: "POST", body: data, token }),
+    request("/api/profiles", { method: "POST", body: data, token }),
   update: (id, data, token) =>
-    request(`/profiles/${id}`, { method: "PUT", body: data, token }),
+    request(`/api/profiles/${id}`, { method: "PUT", body: data, token }),
   remove: (id, token) =>
-    request(`/profiles/${id}`, { method: "DELETE", token }),
+    request(`/api/profiles/${id}`, { method: "DELETE", token }),
 };
 
 export const watchlist = {
   add: (profileId, itemId, token) =>
-    request(`/profiles/${profileId}/watchlist`, {
+    request(`/api/profiles/${profileId}/watchlist`, {
       method: "POST",
       body: { itemId },
       token,
     }),
   remove: (profileId, itemId, token) =>
-    request(`/profiles/${profileId}/watchlist/${itemId}`, {
+    request(`/api/profiles/${profileId}/watchlist/${itemId}`, {
       method: "DELETE",
       token,
     }),
 };
 
-export default { auth, movies, profiles, watchlist };
+export default { auth, movies, series, profiles, watchlist };

@@ -65,7 +65,7 @@ export default function SeriesForm({ editMode }) {
         await api.movies.create({ ...formData, Type: "series" }, token);
         toast.success("Serie creada exitosamente");
       }
-      navigate("/series");
+      navigate("/api/series");
     } catch (err) {
       console.error(err);
       toast.error(err.message || (editMode ? "Error al actualizar la serie" : "Error al crear la serie"));
