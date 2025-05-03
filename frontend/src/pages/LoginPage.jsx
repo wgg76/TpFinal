@@ -4,7 +4,7 @@ import React, { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { AuthContext } from "../context/AuthContext";
-import api from "../services/api";              // ← importamos tu helper
+import api from "../services/api";          
 
 export default function LoginPage() {
   const [credentials, setCredentials] = useState({ email: "", password: "" });
@@ -28,16 +28,15 @@ export default function LoginPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Error al iniciar sesión");
-
-      // guardamos el token en contexto y localStorage
+  
+      // 2) Guardamos el token en contexto y localStorage
       login(data.token);
       toast.success("Inicio de sesión exitoso");
-
-      // 2) Obtener perfiles existentes usando tu helper y pasando data.token
+  
+      // 3) Obtener perfiles existentes usando tu helper con el token recién obtenido
       const perfiles = await api.profiles.list(data.token);
-
-      // 3) Si hay perfiles, activa el primero y navega a /movies,
-      //    si no, lleva a crear perfil
+  
+      // 4) Decidir ruta según existencia de perfiles
       if (perfiles.length > 0) {
         setActiveProfile(perfiles[0]);
         navigate("/movies");
