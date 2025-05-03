@@ -128,9 +128,14 @@ const Header = () => {
           {user?.role === "admin" && isSeriesPage && (
             <Link to="/series/create" className={btnStyle}>Agregar Serie</Link>
           )}
+
+          {/* Anulado boton carga masiva
           {user?.role === "admin" && (
             <button onClick={handleSeed} className={btnStyle}>🚀 Carga masiva</button>
           )}
+          */}
+
+
           {user?.role === "admin" && (
             <button onClick={handleReport} className={btnStyle}>Reporte</button>
           )}
