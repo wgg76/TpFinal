@@ -1,7 +1,7 @@
 // src/routes/profiles.js
 import express from "express";
 import Profile from "../models/Profile.js";
-import { requireAuth, requireAdmin } from "../middleware/requireAuth.js";
+import { requireAuth } from "../middleware/requireAuth.js"; // <-- quita requireAdmin
 
 const router = express.Router();
 
