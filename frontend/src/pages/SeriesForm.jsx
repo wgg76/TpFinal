@@ -43,7 +43,7 @@ export default function SeriesForm({ editMode }) {
     if (!editMode) return;
     (async () => {
       try {
-        const data = await api.movies.get(id, token);
+        const data = await api.series.get(id, token);
         reset({
           Title: data.Title || "",
           imdbID: data.imdbID || "",
