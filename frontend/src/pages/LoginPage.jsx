@@ -31,6 +31,8 @@ export default function LoginPage() {
   
       // 2) Guardamos el token en contexto y localStorage
       login(data.token);
+      console.log("🔑 JWT recibido:", data.token);
+      console.log("🌐 API_BASE:", API_BASE);
       toast.success("Inicio de sesión exitoso");
   
       // 3) Obtener perfiles existentes usando tu helper con el token recién obtenido
