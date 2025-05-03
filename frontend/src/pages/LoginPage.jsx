@@ -4,6 +4,7 @@ import React, { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { AuthContext } from "../context/AuthContext";
+import api from "../services/api";              // ← importamos tu helper
 
 export default function LoginPage() {
   const [credentials, setCredentials] = useState({ email: "", password: "" });
@@ -27,21 +28,20 @@ export default function LoginPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Error al iniciar sesión");
+
+      // guardamos el token en contexto y localStorage
       login(data.token);
       toast.success("Inicio de sesión exitoso");
 
-      // 2) Obtener perfiles existentes
-      const perfRes = await fetch(`${API_BASE}/api/profiles`, {
-        headers: { Authorization: `Bearer ${data.token}` },
-      });
-      const perfiles = perfRes.ok ? await perfRes.json() : [];
+      // 2) Obtener perfiles existentes usando tu helper y pasando data.token
+      const perfiles = await api.profiles.list(data.token);
 
+      // 3) Si hay perfiles, activa el primero y navega a /movies,
+      //    si no, lleva a crear perfil
       if (perfiles.length > 0) {
-        // 3a) Si hay perfiles, activar el primero y redirigir a películas
         setActiveProfile(perfiles[0]);
         navigate("/movies");
       } else {
-        // 3b) Si no, ir a crear un nuevo perfil
         navigate("/profiles/new");
       }
     } catch (err) {
@@ -59,7 +59,6 @@ export default function LoginPage() {
           <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 text-center">
             Iniciar Sesión
           </h2>
-
           <div className="mb-5 sm:mb-6">
             <label htmlFor="email" className="block mb-2 text-base sm:text-lg">
               Email
@@ -75,9 +74,11 @@ export default function LoginPage() {
               className="w-full p-3 text-base sm:text-lg rounded border focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
           </div>
-
           <div className="mb-7 sm:mb-8">
-            <label htmlFor="password" className="block mb-2 text-base sm:text-lg">
+            <label
+              htmlFor="password"
+              className="block mb-2 text-base sm:text-lg"
+            >
               Contraseña
             </label>
             <input
@@ -91,14 +92,12 @@ export default function LoginPage() {
               className="w-full p-3 text-base sm:text-lg rounded border focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
           </div>
-
           <button
             type="submit"
             className="w-full py-3 text-lg sm:text-xl font-semibold rounded bg-blue-600 hover:bg-blue-700 text-white transition-colors"
           >
             Acceder
           </button>
-
           <p className="mt-5 sm:mt-6 text-center text-base sm:text-lg">
             ¿No tienes cuenta?{" "}
             <Link to="/register" className="text-blue-600 hover:underline">
