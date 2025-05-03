@@ -64,7 +64,7 @@ const Header = () => {
       });
     }
   };
-
+{/* Carga Masiva 1
   const handleReport = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -86,6 +86,7 @@ const Header = () => {
       toast.error("No se pudo descargar el reporte");
     }
   };
+  */}
 
   const btnStyle = `
     px-4 py-2
@@ -129,12 +130,13 @@ const Header = () => {
             <Link to="/series/create" className={btnStyle}>Agregar Serie</Link>
           )}
 
-          {/* Anulado boton carga masiva
+          {/*
+
           {user?.role === "admin" && (
             <button onClick={handleSeed} className={btnStyle}>🚀 Carga masiva</button>
           )}
-          */}
 
+          */}
 
           {user?.role === "admin" && (
             <button onClick={handleReport} className={btnStyle}>Reporte</button>
