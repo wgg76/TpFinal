@@ -1,14 +1,13 @@
 // src/context/AuthContext.jsx
 
 import { createContext, useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import api from "../services/api";
 
 export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const navigate = useNavigate();
+ 
   const [token, setToken] = useState(null);
   const [user, setUser] = useState(null);
   const [activeProfile, setActiveProfile] = useState(() => {

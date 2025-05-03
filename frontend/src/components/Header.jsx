@@ -1,7 +1,7 @@
 // src/components/Header.jsx
 
 import React, { useContext } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import SearchBar from "./SearchBar";
 import { SearchContext } from "../context/SearchContext";
 import { AuthContext } from "../context/AuthContext";
@@ -17,8 +17,7 @@ const Header = () => {
   const { searchTerm, setSearchTerm } = useContext(SearchContext);
   const { user, logout, activeProfile } = useContext(AuthContext);
   const { theme, toggleTheme } = useContext(ThemeContext);
-  const navigate = useNavigate();
-
+  
   // Ocultar en login / register / home sin usuario
   const hideButtons =
     pathname === "/login" ||
