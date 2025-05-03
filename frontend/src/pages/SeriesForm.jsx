@@ -9,7 +9,9 @@ import { toast, ToastContainer } from "react-toastify";
 import { AuthContext } from "../context/AuthContext";
 import api from "../services/api";
 
-// Esquema de validación con Yup
+// Declaramos API_BASE igual que en el resto de componentes
+const API_BASE = import.meta.env.VITE_API_URL;
+
 const schema = yup.object({
   Title: yup.string().required("El título es obligatorio"),
   imdbID: yup
@@ -38,7 +40,7 @@ export default function SeriesForm({ editMode }) {
     defaultValues: { Title: "", imdbID: "", Year: "" },
   });
 
-  // Cargar datos si estamos en modo edición
+  // Cargar datos en modo edición
   useEffect(() => {
     if (!editMode) return;
     (async () => {
@@ -59,21 +61,33 @@ export default function SeriesForm({ editMode }) {
   const onSubmit = async (formData) => {
     try {
       if (editMode) {
-        console.log("📡 Enviando UPDATE serie a:", `${API_BASE}/api/series/${id}`, formData);
+        console.log(
+          "📡 Enviando UPDATE serie a:",
+          `${API_BASE}/api/series/${id}`,
+          formData
+        );
         await api.series.updateById(id, formData, token);
         toast.success("Serie actualizada exitosamente");
       } else {
-        console.log("📡 Enviando CREATE serie a:", `${API_BASE}/api/series`, formData);
+        console.log(
+          "📡 Enviando CREATE serie a:",
+          `${API_BASE}/api/series`,
+          formData
+        );
         await api.series.create({ ...formData, Type: "series" }, token);
         toast.success("Serie creada exitosamente");
       }
       navigate("/series");
     } catch (err) {
       console.error(err);
-      toast.error(err.message);
+      toast.error(
+        err.message ||
+          (editMode
+            ? "Error al actualizar la serie"
+            : "Error al crear la serie")
+      );
     }
   };
-  
 
   return (
     <div className="w-full max-w-xl mx-auto p-6">
@@ -107,7 +121,9 @@ export default function SeriesForm({ editMode }) {
             placeholder="Ingrese el ID de IMDB"
           />
           {errors.imdbID && (
-            <p className="text-red-500 text-sm mt-1">{errors.imdbID.message}</p>
+            <p className="text-red-500 text-sm mt-1">
+              {errors.imdbID.message}
+            </p>
           )}
         </div>
 
