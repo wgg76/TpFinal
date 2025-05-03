@@ -11,7 +11,7 @@ dotenv.config();
 
 const app = express();
 
-// __dirname para ESM
+// __dirname en ESM
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -19,7 +19,7 @@ const __dirname = path.dirname(__filename);
 app.use(express.json());
 app.use(cors());
 
-// Rutas API existentes
+// Rutas API
 import usersRouter from "./routes/users.js";
 import authRouter from "./routes/auth.js";
 import profilesRouter from "./routes/profiles.js";
@@ -33,8 +33,8 @@ app.use("/api/series", moviesRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/reports", reportsRouter);
 
-// Ruta raíz
-app.get("*", (_req, res) => {
+// Ruta raíz de la API
+app.get("/api", (_req, res) => {
   res.send("API de Usuarios, Perfiles y Películas funcionando");
 });
 
@@ -58,12 +58,12 @@ app.get("/api/movies-json", (req, res) => {
 const clientDist = path.join(__dirname, "../frontend/dist");
 app.use(express.static(clientDist));
 
-// Fallback SPA
+// Fallback para SPA: cualquier ruta no-api entrega index.html
 app.get("*", (_req, res) => {
   res.sendFile(path.join(clientDist, "index.html"));
 });
 
-// Conexión MongoDB y arranque
+// Conexión a MongoDB y arranque
 const mongoURI = process.env.MONGO_URI;
 if (!mongoURI) {
   console.error("❌ Faltó MONGO_URI en .env");
