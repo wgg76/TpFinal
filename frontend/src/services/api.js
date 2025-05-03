@@ -7,18 +7,21 @@ const API_URL = import.meta.env.VITE_API_URL || "";
  */
 async function request(path, { method = "GET", body, token } = {}) {
   const url = `${API_URL}${path}`;
-  // ① Añade este log para ver token y URL en la consola del navegador
+  // Log para depuración: muestra la URL y el token usado
   console.log(`→ [API] ${method} ${url} — token:`, token);
 
   const headers = { "Content-Type": "application/json" };
   if (token) headers.Authorization = `Bearer ${token}`;
 
-  const res = await fetch(url, {
+  const response = await fetch(url, {
     method,
     headers,
     body: body ? JSON.stringify(body) : undefined,
   });
-  // …
+
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || "Error en API");
+  return data;
 }
 
 export const auth = {
@@ -53,7 +56,6 @@ export const movies = {
     request(`/api/movies/${id}`, { method: "DELETE", token }),
 };
 
-// Añade este bloque para series, espejo de movie pero apuntando a /api/series
 export const series = {
   list: (params, token) => {
     const query = new URLSearchParams(params).toString();
