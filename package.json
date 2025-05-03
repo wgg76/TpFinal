@@ -1,0 +1,21 @@
+{
+  "name": "blockbuster-online-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "build-all": "npm --prefix frontend ci && npm --prefix frontend run build && npm --prefix backend ci",
+    "build":     "npm --prefix frontend run build && npm --prefix backend run lint",
+    "start":     "npm --prefix backend start",
+    "dev":       "concurrently \"npm --prefix backend run dev\" \"npm --prefix frontend run dev\""
+  },
+  "dependencies": {
+    "concurrently": "^7.6.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

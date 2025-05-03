@@ -5,7 +5,7 @@
   "type": "module",
   "main": "server.js",
   "scripts": {
-    "postinstall": "cd ../frontend && npm ci && npm run build",
+    
     "dev": "nodemon server.js",
     "start": "node server.js",
     "lint": "eslint .",
