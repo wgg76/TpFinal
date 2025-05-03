@@ -40,17 +40,17 @@ app.get("/api", (_req, res) => {
 
 // JSON de trailers o fallback
 app.get("/api/movies-json", (req, res) => {
-  console.log("🛠️ Petición a /api/movies-json recibida");
   const enriched = path.join(__dirname, "data", "movies.withTrailers.json");
   const original = path.join(__dirname, "data", "movies.json");
-  let fileToServe = null;
-  if (fs.existsSync(enriched)) fileToServe = enriched;
-  else if (fs.existsSync(original)) fileToServe = original;
+  const fileToServe = fs.existsSync(enriched)
+    ? enriched
+    : fs.existsSync(original)
+      ? original
+      : null;
   if (!fileToServe) {
     console.error("❌ No se encontró JSON de películas");
     return res.status(404).send("Not Found");
   }
-  console.log("🛠️ Sirviendo fichero:", fileToServe);
   res.sendFile(fileToServe);
 });
 
@@ -58,8 +58,9 @@ app.get("/api/movies-json", (req, res) => {
 const clientDist = path.join(__dirname, "../frontend/dist");
 app.use(express.static(clientDist));
 
-// Fallback para SPA: cualquier ruta no-api entrega index.html
-app.get("*", (_req, res) => {
+// **FALLBACK SPA**
+// Sólo intercepta rutas que NO empiecen con `/api`
+app.get(/^(?!\/api).*/, (_req, res) => {
   res.sendFile(path.join(clientDist, "index.html"));
 });
 
