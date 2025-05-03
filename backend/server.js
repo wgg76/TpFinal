@@ -34,7 +34,7 @@ app.use("/api/users", usersRouter);
 app.use("/api/reports", reportsRouter);
 
 // Ruta raíz
-app.get("/api", (_req, res) => {
+app.get("*", (_req, res) => {
   res.send("API de Usuarios, Perfiles y Películas funcionando");
 });
 
@@ -59,7 +59,11 @@ const clientDist = path.join(__dirname, "../frontend/dist");
 app.use(express.static(clientDist));
 
 // Fallback SPA
+<<<<<<< HEAD
 app.get("/", (_req, res) => {
+=======
+app.get("*", (_req, res) => {
+>>>>>>> 76bfa78 (fix: corregir flujo de login y obtención de perfiles)
   res.sendFile(path.join(clientDist, "index.html"));
 });
 
