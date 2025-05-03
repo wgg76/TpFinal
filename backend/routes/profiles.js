@@ -1,150 +1,191 @@
 // src/routes/profiles.js
 import express from "express";
 import Profile from "../models/Profile.js";
+import User from "../models/User.js";
 import { requireAuth } from "../middleware/requireAuth.js";
 
 const router = express.Router();
 
 /**
- * 1) LISTAR TODOS LOS PERFILES DEL USUARIO AUTENTICADO
+ * GET /api/profiles
+ * → Devuelve TODOS los perfiles (admin y usuarios).
+ *   Lo dejamos así para no romper el flujo de login.
  */
 router.get("/", requireAuth, async (req, res) => {
   try {
-    const profiles = await Profile.find({ userId: req.userId });
-    res.json(profiles);
+    const perfiles = await Profile.find();
+    return res.json(perfiles);
   } catch (err) {
-    console.error("Error al listar perfiles:", err);
-    res.status(500).json({ error: err.message });
+    console.error("Error al obtener perfiles:", err);
+    return res.status(500).json({ error: err.message });
   }
 });
 
 /**
- * 2) CREAR NUEVO PERFIL (se asocia automáticamente al userId)
+ * POST /api/profiles
+ * → Crea un perfil para el usuario autenticado
  */
 router.post("/", requireAuth, async (req, res) => {
+  const { name, dob } = req.body;
+  if (!name || !dob) {
+    return res.status(400).json({ error: "Faltan name o dob" });
+  }
+  const birth = new Date(dob);
+  const diffMs = Date.now() - birth.getTime();
+  const age = new Date(diffMs).getUTCFullYear() - 1970;
+  const type = age < 13 ? "child" : "standard";
+
   try {
-    const profile = new Profile({
-      ...req.body,
-      userId: req.userId,       // ← asociamos el perfil al usuario
-      watchlist: [],            // iniciamos lista vacía
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
+
+    const nuevo = await Profile.create({
+      name,
+      dob: birth,
+      age,
+      type,
+      user: req.userId,
+      email: user.email,
     });
-    await profile.save();
-    res.status(201).json(profile);
+    return res.status(201).json(nuevo);
   } catch (err) {
     console.error("Error al crear perfil:", err);
-    res.status(400).json({ error: err.message });
+    return res.status(500).json({ error: err.message });
   }
 });
 
 /**
- * 3) DETALLE DE UN PERFIL PROPIO
- */
-router.get("/:id", requireAuth, async (req, res) => {
-  try {
-    const profile = await Profile.findOne({
-      _id: req.params.id,
-      userId: req.userId,       // ← sólo si te pertenece
-    });
-    if (!profile) {
-      return res.status(404).json({ error: "Perfil no encontrado" });
-    }
-    res.json(profile);
-  } catch (err) {
-    console.error("Error al obtener perfil:", err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-/**
- * 4) ACTUALIZAR UN PERFIL PROPIO
+ * PUT /api/profiles/:id
+ * → Edita un perfil existente
  */
 router.put("/:id", requireAuth, async (req, res) => {
   try {
-    const updated = await Profile.findOneAndUpdate(
-      { _id: req.params.id, userId: req.userId },
-      req.body,
-      { new: true, runValidators: true }
-    );
-    if (!updated) {
-      return res.status(404).json({ error: "Perfil no encontrado" });
+    const perfil = await Profile.findById(req.params.id);
+    if (!perfil) return res.status(404).json({ error: "Perfil no encontrado" });
+
+    // Solo el dueño o admin puede modificar un perfil
+    if (req.userId !== perfil.user.toString() && req.userRole !== "admin") {
+      return res.status(403).json({ error: "Sin permiso" });
     }
-    res.json(updated);
+
+    const { name, dob } = req.body;
+    if (name) perfil.name = name;
+    if (dob) {
+      const birth = new Date(dob);
+      perfil.dob = birth;
+      const diffMs = Date.now() - birth.getTime();
+      perfil.age = new Date(diffMs).getUTCFullYear() - 1970;
+      perfil.type = perfil.age < 13 ? "child" : "standard";
+    }
+    const actualizado = await perfil.save();
+    return res.json(actualizado);
   } catch (err) {
     console.error("Error al actualizar perfil:", err);
-    res.status(400).json({ error: err.message });
+    return res.status(500).json({ error: err.message });
   }
 });
 
 /**
- * 5) BORRAR UN PERFIL PROPIO
+ * DELETE /api/profiles/:id
+ * → Elimina un perfil
  */
 router.delete("/:id", requireAuth, async (req, res) => {
   try {
-    const removed = await Profile.findOneAndDelete({
-      _id: req.params.id,
-      userId: req.userId,
-    });
-    if (!removed) {
-      return res.status(404).json({ error: "Perfil no encontrado" });
+    const perfil = await Profile.findById(req.params.id);
+    if (!perfil) return res.status(404).json({ error: "Perfil no encontrado" });
+
+    if (req.userId !== perfil.user.toString() && req.userRole !== "admin") {
+      return res.status(403).json({ error: "Sin permiso" });
     }
-    res.json({ message: "Perfil eliminado" });
+
+    await perfil.deleteOne();
+    return res.json({ message: "Perfil eliminado" });
   } catch (err) {
-    console.error("Error al borrar perfil:", err);
-    res.status(500).json({ error: err.message });
+    console.error("Error al eliminar perfil:", err);
+    return res.status(500).json({ error: err.message });
   }
 });
 
 /**
- * 6) AÑADIR ITEM AL WATCHLIST DE UN PERFIL PROPIO
+ * POST /api/profiles/:id/watchlist
+ * → Añade `itemId` a la watchlist de ese perfil
  */
 router.post(
-  "/:profileId/watchlist",
+  "/:id/watchlist",
   requireAuth,
   async (req, res) => {
     try {
-      const profile = await Profile.findOne({
-        _id: req.params.profileId,
-        userId: req.userId,     // ← comprobamos propiedad
-      });
-      if (!profile) {
-        return res.status(404).json({ error: "Perfil no encontrado" });
+      const { itemId } = req.body;
+      const perfil = await Profile.findById(req.params.id);
+      if (!perfil) return res.status(404).json({ error: "Perfil no encontrado" });
+
+      // Solo el dueño o admin puede modificar la watchlist
+      if (req.userId !== perfil.user.toString() && req.userRole !== "admin") {
+        return res.status(403).json({ error: "Sin permiso" });
       }
-      // no duplicados
-      if (!profile.watchlist.includes(req.body.itemId)) {
-        profile.watchlist.push(req.body.itemId);
-        await profile.save();
-      }
-      res.json(profile);
+
+      const actualizado = await Profile.findByIdAndUpdate(
+        req.params.id,
+        { $addToSet: { watchlist: itemId } },
+        { new: true }
+      );
+      return res.json(actualizado);
     } catch (err) {
-      console.error("Error al añadir watchlist:", err);
-      res.status(400).json({ error: err.message });
+      console.error("Error añadiendo watchlist:", err);
+      return res.status(500).json({ error: err.message });
     }
   }
 );
 
 /**
- * 7) ELIMINAR ITEM DEL WATCHLIST DE UN PERFIL PROPIO
+ * DELETE /api/profiles/:id/watchlist/:itemId
+ * → Elimina `itemId` de la watchlist
  */
 router.delete(
-  "/:profileId/watchlist/:itemId",
+  "/:id/watchlist/:itemId",
   requireAuth,
   async (req, res) => {
     try {
-      const profile = await Profile.findOne({
-        _id: req.params.profileId,
-        userId: req.userId,
-      });
-      if (!profile) {
-        return res.status(404).json({ error: "Perfil no encontrado" });
+      const perfil = await Profile.findById(req.params.id);
+      if (!perfil) return res.status(404).json({ error: "Perfil no encontrado" });
+
+      if (req.userId !== perfil.user.toString() && req.userRole !== "admin") {
+        return res.status(403).json({ error: "Sin permiso" });
       }
-      profile.watchlist = profile.watchlist.filter(
-        (i) => i !== req.params.itemId
+
+      const actualizado = await Profile.findByIdAndUpdate(
+        req.params.id,
+        { $pull: { watchlist: req.params.itemId } },
+        { new: true }
       );
-      await profile.save();
-      res.json(profile);
+      return res.json(actualizado);
     } catch (err) {
-      console.error("Error al eliminar watchlist:", err);
-      res.status(500).json({ error: err.message });
+      console.error("Error eliminando watchlist:", err);
+      return res.status(500).json({ error: err.message });
+    }
+  }
+);
+
+/**
+ * GET /api/profiles/:id/watchlist
+ * → Devuelve SOLO los IDs de la watchlist de un perfil (con permisos)
+ */
+router.get(
+  "/:id/watchlist",
+  requireAuth,
+  async (req, res) => {
+    try {
+      const perfil = await Profile.findById(req.params.id, "watchlist user");
+      if (!perfil) return res.status(404).json({ error: "Perfil no encontrado" });
+
+      if (req.userId !== perfil.user.toString() && req.userRole !== "admin") {
+        return res.status(403).json({ error: "Sin permiso" });
+      }
+
+      return res.json(perfil.watchlist);
+    } catch (err) {
+      console.error("Error obteniendo watchlist:", err);
+      return res.status(500).json({ error: err.message });
     }
   }
 );
