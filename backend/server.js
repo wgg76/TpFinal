@@ -59,11 +59,7 @@ const clientDist = path.join(__dirname, "../frontend/dist");
 app.use(express.static(clientDist));
 
 // Fallback SPA
-<<<<<<< HEAD
-app.get("/", (_req, res) => {
-=======
 app.get("*", (_req, res) => {
->>>>>>> 76bfa78 (fix: corregir flujo de login y obtención de perfiles)
   res.sendFile(path.join(clientDist, "index.html"));
 });
 
@@ -79,9 +75,11 @@ mongoose
   .then(() => {
     console.log("✅ Conectado a MongoDB");
     const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () => console.log(`🚀 Servidor corriendo en puerto ${PORT}`));
+    app.listen(PORT, () =>
+      console.log(`🚀 Servidor corriendo en puerto ${PORT}`)
+    );
   })
-  .catch(err => {
+  .catch((err) => {
     console.error("❌ Error al conectar a MongoDB:", err);
     process.exit(1);
   });
