@@ -59,22 +59,18 @@ export default function SeriesForm({ editMode }) {
   const onSubmit = async (formData) => {
     try {
       if (editMode) {
+        console.log("📡 Enviando UPDATE serie a:", `${API_BASE}/api/series/${id}`, formData);
         await api.series.updateById(id, formData, token);
         toast.success("Serie actualizada exitosamente");
       } else {
+        console.log("📡 Enviando CREATE serie a:", `${API_BASE}/api/series`, formData);
         await api.series.create({ ...formData, Type: "series" }, token);
         toast.success("Serie creada exitosamente");
       }
-      // Navegar al listado de series
       navigate("/series");
     } catch (err) {
       console.error(err);
-      toast.error(
-        err.message ||
-          (editMode
-            ? "Error al actualizar la serie"
-            : "Error al crear la serie")
-      );
+      toast.error(err.message);
     }
   };
   
