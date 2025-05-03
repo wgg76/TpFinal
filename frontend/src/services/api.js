@@ -6,19 +6,19 @@ const API_URL = import.meta.env.VITE_API_URL || "";
  * Utilidad genérica para peticiones al backend
  */
 async function request(path, { method = "GET", body, token } = {}) {
+  const url = `${API_URL}${path}`;
+  // ① Añade este log para ver token y URL en la consola del navegador
+  console.log(`→ [API] ${method} ${url} — token:`, token);
+
   const headers = { "Content-Type": "application/json" };
   if (token) headers.Authorization = `Bearer ${token}`;
 
-  //console.log("→ Fetching:", `${API_URL}${path}`);
-  const res = await fetch(`${API_URL}${path}`, {
+  const res = await fetch(url, {
     method,
     headers,
     body: body ? JSON.stringify(body) : undefined,
   });
-
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || "Error en API");
-  return data;
+  // …
 }
 
 export const auth = {
