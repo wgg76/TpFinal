@@ -89,12 +89,20 @@ export default function Home() {
       </div>
 
       {!user && (
+        <>
         <Link
           to="/login"
           className="inline-block bg-yellow-400 text-black px-6 py-3 rounded hover:bg-yellow-300 transition"
         >
           Iniciar Sesión
         </Link>
+         <Link
+         to="/register"
+         className="inline-block bg-green-500 text-white px-6 py-3 rounded hover:bg-green-400 transition"
+       >
+         Registrarse
+       </Link>
+       </>
       )}
     </section>
   );

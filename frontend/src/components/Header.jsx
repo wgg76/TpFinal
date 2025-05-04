@@ -1,5 +1,3 @@
-// src/components/Header.jsx
-
 import React, { useContext } from "react";
 import { Link, useLocation } from "react-router-dom";
 import SearchBar from "./SearchBar";
