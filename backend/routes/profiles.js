@@ -1,6 +1,7 @@
 // src/routes/profiles.js
 import express from "express";
 import Profile from "../models/Profile.js";
+import User from "../models/User.js";                    // ⬅️ añadido
 import { requireAuth } from "../middleware/requireAuth.js";
 
 const router = express.Router();
@@ -38,19 +39,31 @@ router.post("/", requireAuth, async (req, res) => {
     const age = new Date(diffMs).getUTCFullYear() - 1970;
     const type = age < 13 ? "child" : "standard";
 
+    // 📝 Recuperamos al usuario para obtener su email real
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+
     const nuevo = await Profile.create({
       name,
       dob: birth,
       age,
       type,
       user: req.userId,
-      email: req.userEmail,          // asumo que tu requireAuth añade userEmail
-      avatar,                        // si no lo recibes, quita esta línea
+      email: user.email,     // ⬅️ sustituido req.userEmail por user.email
+      avatar,
     });
+
     return res.status(201).json(nuevo);
   } catch (err) {
+    // 🔥 Log completo del error en servidor para diagnóstico
     console.error("Error POST /profiles:", err);
-    return res.status(500).json({ error: "Error interno del servidor" });
+    // devolvemos mensaje y detalle para el client
+    return res.status(500).json({
+      error:   "Error interno al crear perfil",
+      details: err.message
+    });
   }
 });
 
