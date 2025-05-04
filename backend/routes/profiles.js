@@ -1,15 +1,13 @@
 // src/routes/profiles.js
 import express from "express";
 import Profile from "../models/Profile.js";
-import User from "../models/User.js";
-import { requireAuth } from "../middleware/requireAuth.js"; // <-- sólo requireAuth
+import { requireAuth } from "../middleware/requireAuth.js";
 
 const router = express.Router();
 
 /**
  * GET /api/profiles
- * - Admin: ve todos los perfiles (sin watchlist)
- * - Usuario normal: ve sólo los suyos (sin watchlist)
+ * Devuelve todos los perfiles (admin) o solo los del usuario autenticado (standard).
  */
 router.get("/", requireAuth, async (req, res) => {
   try {
@@ -20,17 +18,17 @@ router.get("/", requireAuth, async (req, res) => {
     const perfiles = await Profile.find(filter).select("-watchlist");
     return res.json(perfiles);
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: err.message });
+    console.error("Error GET /profiles:", err);
+    return res.status(500).json({ error: "Error interno del servidor" });
   }
 });
 
 /**
  * POST /api/profiles
- * - Usuario autenticado: crea un nuevo perfil para sí mismo
+ * Crea un nuevo perfil para el usuario autenticado.
  */
 router.post("/", requireAuth, async (req, res) => {
-  const { name, dob } = req.body;
+  const { name, dob, avatar } = req.body;
   if (!name || !dob) {
     return res.status(400).json({ error: "Faltan name o dob" });
   }
@@ -40,29 +38,25 @@ router.post("/", requireAuth, async (req, res) => {
     const age = new Date(diffMs).getUTCFullYear() - 1970;
     const type = age < 13 ? "child" : "standard";
 
-    const user = await User.findById(req.userId);
-    if (!user) {
-      return res.status(404).json({ error: "Usuario no encontrado" });
-    }
-
     const nuevo = await Profile.create({
       name,
       dob: birth,
       age,
       type,
       user: req.userId,
-      email: user.email,
+      email: req.userEmail,          // asumo que tu requireAuth añade userEmail
+      avatar,                        // si no lo recibes, quita esta línea
     });
     return res.status(201).json(nuevo);
   } catch (err) {
-    console.error("Error al crear perfil:", err);
-    return res.status(500).json({ error: err.message });
+    console.error("Error POST /profiles:", err);
+    return res.status(500).json({ error: "Error interno del servidor" });
   }
 });
 
 /**
  * GET /api/profiles/:id/watchlist
- * → Sólo el dueño o el admin pueden ver la lista
+ * Devuelve la watchlist de un perfil (propio o admin).
  */
 router.get("/:id/watchlist", requireAuth, async (req, res) => {
   try {
@@ -78,14 +72,14 @@ router.get("/:id/watchlist", requireAuth, async (req, res) => {
 
     return res.json(perfil.watchlist);
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: err.message });
+    console.error("Error GET /profiles/:id/watchlist:", err);
+    return res.status(500).json({ error: "Error interno del servidor" });
   }
 });
 
 /**
  * POST /api/profiles/:id/watchlist
- * → Sólo el dueño o el admin pueden modificar su watchlist
+ * Añade un ítem a la watchlist de un perfil (propio o admin).
  */
 router.post("/:id/watchlist", requireAuth, async (req, res) => {
   try {
@@ -99,21 +93,18 @@ router.post("/:id/watchlist", requireAuth, async (req, res) => {
       return res.status(403).json({ error: "Sin permiso" });
     }
 
-    const actualizado = await Profile.findByIdAndUpdate(
-      req.params.id,
-      { $addToSet: { watchlist: req.body.itemId } },
-      { new: true }
-    );
-    return res.json(actualizado);
+    perfil.watchlist.addToSet(req.body.itemId);
+    await perfil.save();
+    return res.json(perfil);
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: err.message });
+    console.error("Error POST /profiles/:id/watchlist:", err);
+    return res.status(500).json({ error: "Error interno del servidor" });
   }
 });
 
 /**
  * DELETE /api/profiles/:id/watchlist/:itemId
- * → Sólo el dueño o el admin pueden modificar su watchlist
+ * Elimina un ítem de la watchlist (propio o admin).
  */
 router.delete("/:id/watchlist/:itemId", requireAuth, async (req, res) => {
   try {
@@ -127,15 +118,37 @@ router.delete("/:id/watchlist/:itemId", requireAuth, async (req, res) => {
       return res.status(403).json({ error: "Sin permiso" });
     }
 
-    const actualizado = await Profile.findByIdAndUpdate(
-      req.params.id,
-      { $pull: { watchlist: req.params.itemId } },
-      { new: true }
-    );
-    return res.json(actualizado);
+    perfil.watchlist.pull(req.params.itemId);
+    await perfil.save();
+    return res.json(perfil);
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: err.message });
+    console.error("Error DELETE /profiles/:id/watchlist/:itemId:", err);
+    return res.status(500).json({ error: "Error interno del servidor" });
+  }
+});
+
+/**
+ * DELETE /api/profiles/:pid
+ * Elimina un perfil completo (propio o admin).
+ */
+router.delete("/:pid", requireAuth, async (req, res) => {
+  try {
+    const perfil = await Profile.findById(req.params.pid);
+    if (!perfil) {
+      return res.status(404).json({ error: "Perfil no encontrado" });
+    }
+    if (
+      req.userRole !== "admin" &&
+      perfil.user.toString() !== req.userId
+    ) {
+      return res.status(403).json({ error: "Sin permiso" });
+    }
+
+    await Profile.findByIdAndDelete(req.params.pid);
+    return res.json({ message: "Perfil eliminado correctamente" });
+  } catch (err) {
+    console.error("Error DELETE /profiles/:pid:", err);
+    return res.status(500).json({ error: "Error interno del servidor" });
   }
 });
 
