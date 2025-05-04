@@ -91,7 +91,7 @@ export default function Register() {
 
         <button
           type="button"
-          onClick={() => navigate("/login", { replace: true })}
+          onClick={() => navigate("/", { replace: true })}
           className="w-full bg-gray-300 hover:bg-gray-400 text-black py-2 rounded"
         >
           Cancelar
