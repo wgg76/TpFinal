@@ -66,11 +66,7 @@ export default function Home() {
       {/* Grid 2x2 de trailers */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8 w-full max-w-4xl">
         {trailers.map((t) => (
-          <Link
-            key={t.id}
-            to={t.link}
-            className="group overflow-hidden rounded-lg shadow-lg"
-          >
+          <Link key={t.id} to={t.link} className="group overflow-hidden rounded-lg shadow-lg">
             <div className="relative pb-[56.25%]">
               <iframe
                 className="absolute inset-0 w-full h-full"
@@ -89,21 +85,20 @@ export default function Home() {
       </div>
 
       {!user && (
-      <div className="inline-flex items-center space-x-4">
         <>
-        <Link
-          to="/login"
-          className="inline-block bg-yellow-400 text-black px-6 py-3 rounded hover:bg-yellow-300 transition"
-        >
-          Iniciar Sesión
-        </Link>
-         <Link
-         to="/register"
-         className="inline-block bg-green-500 text-white px-6 py-3 rounded hover:bg-green-400 transition"
-       >
-         Registrarse
-       </Link>
-       </>
+          <Link
+            to="/login"
+            className="inline-block bg-yellow-400 text-black px-6 py-3 rounded hover:bg-yellow-300 transition"
+          >
+            Iniciar Sesión
+          </Link>
+          <Link
+            to="/register"
+            className="inline-block bg-green-500 text-white px-6 py-3 rounded hover:bg-green-400 transition"
+          >
+            Registrarse
+          </Link>
+        </>
       )}
     </section>
   );
