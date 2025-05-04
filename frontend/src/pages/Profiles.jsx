@@ -1,11 +1,11 @@
 // src/pages/Profiles.jsx
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import api from "../services/api";
 import ProfileCard from "../components/ProfileCard";
 import ProfileFormModal from "../components/ProfileFormModal";
-import Background from "../assets/descarga.jpeg";  // <–– tu imagen de assets
+import Background from "../assets/descarga.jpeg";
 
 export default function Profiles() {
   const {
@@ -21,7 +21,8 @@ export default function Profiles() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editProfile, setEditProfile] = useState(null);
 
-  const fetchProfiles = async () => {
+  // Memorizamos fetchProfiles para poder incluirlo en las deps
+  const fetchProfiles = useCallback(async () => {
     try {
       const data = await api.profiles.list(token);
       setProfiles(data);
@@ -32,11 +33,12 @@ export default function Profiles() {
     } catch (err) {
       console.error("Error cargando perfiles:", err);
     }
-  };
+  }, [token]);
 
+  // Ahora incluimos fetchProfiles en el array de deps
   useEffect(() => {
     if (token) fetchProfiles();
-  }, [token]);
+  }, [token, fetchProfiles]);
 
   const handleSubmit = async (data) => {
     try {
@@ -61,14 +63,13 @@ export default function Profiles() {
     <div
       className="min-h-screen bg-black"
       style={{
-              backgroundImage: `url(${Background})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              paddingTop: "140px",
-              paddingBottom: "120px",
-            }}
+        backgroundImage: `url(${Background})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        paddingTop: "140px",
+        paddingBottom: "120px",
+      }}
     >
-      {/* Capa semitransparente para mejorar contraste */}
       <div className="p-8 max-w-4xl mx-auto bg-white bg-opacity-80 rounded-lg mt-12 mb-12">
         <h2 className="text-3xl font-bold mb-6 text-center text-gray-900">
           Tus Perfiles
@@ -85,9 +86,7 @@ export default function Profiles() {
                 setModalOpen(true);
               }}
               onDelete={async () => {
-                if (
-                  window.confirm(`¿Eliminar el perfil “${p.name}”?`)
-                ) {
+                if (window.confirm(`¿Eliminar el perfil “${p.name}”?`)) {
                   await deleteProfile(p._id);
                   await fetchProfiles();
                 }

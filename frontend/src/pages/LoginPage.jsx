@@ -2,7 +2,6 @@ import React, { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { AuthContext } from "../context/AuthContext";
-import api from "../services/api";
 
 export default function LoginPage() {
   const [credentials, setCredentials] = useState({ email: "", password: "" });

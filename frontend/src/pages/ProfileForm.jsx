@@ -33,8 +33,6 @@ export default function ProfileForm({ editMode = false, initialData = {}, onSubm
     await onSubmit(data);
   };
 
-  const selectedAvatar = watch("avatar");
-
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md mx-auto">
       <h2 className="text-2xl font-bold mb-4 text-center">
