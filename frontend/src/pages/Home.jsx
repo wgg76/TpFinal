@@ -53,7 +53,7 @@ export default function Home() {
 
   return (
     <section
-      className="min-h-screen bg-cover bg-center flex flex-col items-center justify-center p-8"
+      className="h-auto bg-cover bg-center flex flex-col items-center justify-start"
       style={{ backgroundImage: `url(${background})` }}
     >
       <h1 className="text-5xl font-bold mb-6 text-white">
