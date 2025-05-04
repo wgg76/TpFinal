@@ -1,146 +1,88 @@
 ![CI](https://github.com/wgg76/TpFinal/actions/workflows/ci.yml/badge.svg)
 
-Mini Netflix Fullstack
 
-Mini Netflix es una aplicación web fullstack que simula una plataforma de streaming tipo "mini Netflix", desarrollada con React en el frontend y Node.js/Express + MongoDB en el backend. Permite:
+# Mini Netflix Fullstack
 
-📋 Registro e Inicio de sesión con JWT.
+Mini Netflix es una aplicación web fullstack que simula una plataforma de streaming tipo “mini Netflix”, desarrollada con React en el frontend y Node.js/Express + MongoDB en el backend.
 
-👤 Gestión de perfiles: creación, edición, eliminación.
+## Prerequisitos
 
-🎬 Catálogo de Películas y Series con:
+* **Node.js** >= 16
+* **npm** >= 8
 
-Búsqueda por título y filtros avanzados (calificación, rango de años).
+## Estructura del proyecto
 
-Paginación y ruteo dinámico.
-
-Detalle con datos enriquecidos de OMDb.
-
-⭐ Watchlist: añadir/quitar favoritos por perfil.
-
-🎖 Ranking IMDb: Top 10 ordenado por IMDb.
-
-🏗️ Arquitectura del proyecto
-
+```bash
 /  (raíz)
-├── frontend/        # Aplicación React + Vite + TailwindCSS
-├── backend/         # API REST con Node.js, Express y MongoDB
-└── README.md        # Vista global del proyecto
+├── frontend/        # Aplicación React + Vite + TailwindCSS y README propio
+├── backend/         # API REST con Node.js, Express, MongoDB y README propio
+└── README.md        # Esta visión global del proyecto
+```
 
-frontend/
+## Tecnologías principales
 
-src/ contiene componentes, páginas, contextos y servicios.
+* **Frontend**: React, Vite, Tailwind CSS, Framer Motion, React Router
+* **Backend**: Node.js, Express, MongoDB, Mongoose, JWT (accessToken 2 h / refreshToken 7 d)
+* **API externa**: OMDb (sinopsis extendida y ratings)
+* **Notificaciones**: react-toastify, SweetAlert2
 
-services/api.js un cliente unificado para todas las peticiones.
+## Clonar el repositorio
 
-Formularios migrados a react-hook-form + Yup.
-
-backend/
-
-src/routes/ define endpoints seguros con JWT.
-
-src/models/ esquemas Mongoose (User, Profile, Movie).
-
-Conexión a MongoDB, consumo de OMDb y validaciones.
-
-🚀 Instalación y arranque#
-
-Clonar repositorio
-
+```bash
 git clone <repo-url>
 cd <repo-root>
+```
 
-Backend
+## Instalación y arranque
 
+### Backend
+
+```bash
 cd backend
 npm install
-# Crear un .env con:
+# Crear .env con las variables:
 #   MONGO_URI=tu_mongo_atlas_uri
 #   JWT_SECRET=una_clave_segura
 #   OMDB_API_KEY=tu_api_key_omdb
-npm run start    # o npm run dev (con nodemon)
+#   YT_API_KEY=tu_youtube_data_api_key (opcional)
+npm run dev
+```
 
-Frontend
+### Frontend
 
+```bash
 cd frontend
 npm install
-# En .env.local (opcional): VITE_API_URL="https://api-tu-dominio.com/api"
-npm run dev     # levanta Vite en http://localhost:5173
+# Crear .env con las variables:
+#   VITE_API_URL=http://localhost:5000/api
+#   VITE_OMDB_API_KEY=tu_api_key_omdb
+npm run dev
+```
 
-🔧 Variables de entorno
+## Variables de entorno
 
-Variable
+| Variable            | Descripción                                   |
+| ------------------- | --------------------------------------------- |
+| `MONGO_URI`         | URI de conexión a MongoDB Atlas               |
+| `JWT_SECRET`        | Clave secreta para firma de tokens JWT        |
+| `OMDB_API_KEY`      | API Key de OMDb                               |
+| `YT_API_KEY`        | YouTube Data API Key (opcional para trailers) |
+| `VITE_API_URL`      | URL base de la API para el frontend           |
+| `VITE_OMDB_API_KEY` | API Key de OMDb para el frontend              |
 
-Descripción
+## Roadmap
 
-MONGO_URI
+* Modo oscuro
+* Comentarios y valoraciones de usuarios
+* Integración con TMDb para trailers
+* Notificaciones en tiempo real (Socket.io)
 
-URI de conexión a MongoDB (Mongo Atlas)
+## Contribuciones
 
-JWT_SECRET
+¡Bienvenido a contribuir! Abre un Pull Request describiendo tu propuesta.
 
-Clave secreta para firma de tokens JWT
+## Licencia
 
-OMDB_API_KEY
+Este proyecto está bajo la licencia [MIT](LICENSE) © Walter Gerhardt
 
-API Key de OMDb
-
-VITE_API_URL
-
-URL base de la API para el frontend (opt.)
-
-📝 Uso y ejemplos
-
-Autenticación
-
-# Registro
-curl -X POST https://tu-api.com/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{ "email": "user@ejemplo.com", "password": "123456" }'
-
-# Login
-echo '{ "email":"user@ejemplo.com", "password":"123456" }' \
-  | curl https://tu-api.com/auth/login -H 'Content-Type: application/json' -d @-
-
-  Perfiles
-
-  # Listar perfiles (con token)
-curl -H "Authorization: Bearer <token>" https://tu-api.com/profiles
-
-# Crear perfil
-echo '{ "name":"Adulto", "dob":"1990-05-10" }' \
-  | curl -X POST https://tu-api.com/profiles -H 'Authorization: Bearer <token>' -d @-
-
-  Watchlist
-
-  # Añadir a watchlist
-curl -X POST https://tu-api.com/profiles/<profileId>/watchlist \
-  -H 'Authorization: Bearer <token>' \
-  -H 'Content-Type: application/json' \
-  -d '{ "itemId":"<movieId>" }'
-
-# Quitar de watchlist
-curl -X DELETE https://tu-api.com/profiles/<profileId>/watchlist/<itemId> \
-  -H 'Authorization: Bearer <token>'
-
-  Listado con filtros
-
-  # Películas tipo "movie" con rating ≥ 7.5 y año entre 2000 y 2010
-echo "GET /movies?type=movie&minRating=7.5&yearFrom=2000&yearTo=2010" \
-  | curl "https://tu-api.com/movies?type=movie&minRating=7.5&yearFrom=2000&yearTo=2010" -H 'Authorization: Bearer <token>'
-
-  🎯 Despliegue
-
-Backend: Deploy en Railway o Heroku, configurando variables seguras en su dashboard.
-
-Frontend: Deploy en Vercel o Netlify, apuntando VITE_API_URL a la URL de tu backend.
-
-CORS: Asegúrate de permitir las rutas de tu frontend en el servidor.
-
-🙌 Contribuciones
-
-¡Eres bienvenido a mejorar este proyecto! Abre un Pull Request y describe tu propuesta.
-
-📜 Licencia
-
-MIT License © Walter Gerhardt
+https://blockbuster-online-tpfinal.onrender.com
