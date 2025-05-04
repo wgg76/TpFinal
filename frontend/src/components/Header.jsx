@@ -1,5 +1,6 @@
+// src/components/Header.jsx
 import React, { useContext } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import SearchBar from "./SearchBar";
 import { SearchContext } from "../context/SearchContext";
 import { AuthContext } from "../context/AuthContext";
@@ -11,6 +12,7 @@ const API_BASE = import.meta.env.VITE_API_URL || "";
 
 const Header = () => {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const { searchTerm, setSearchTerm } = useContext(SearchContext);
   const { user, logout, activeProfile } = useContext(AuthContext);
   const { theme, toggleTheme } = useContext(ThemeContext);
@@ -30,35 +32,6 @@ const Header = () => {
     logout();
     window.location.replace("/");
   };
-
-  /* 
-  // Función de carga masiva comentada porque ya no la usamos
-  const handleSeed = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`${API_BASE}/movies/seed`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || `Status ${res.status}`);
-      }
-      const data = await res.json();
-      await Swal.fire({
-        icon: "success",
-        title: "¡Carga masiva completada!",
-        text: `${data.count} elementos insertados.`,
-      });
-    } catch (err) {
-      await Swal.fire({
-        icon: "error",
-        title: "Error en carga masiva",
-        text: err.message,
-      });
-    }
-  };
-  */
 
   const handleReport = async () => {
     try {
@@ -91,8 +64,13 @@ const Header = () => {
     transition-colors
   `;
 
+  // Construye la URL del avatar del perfil activo (fallback con robohash)
+  const avatarUrl = activeProfile?.avatar
+    || `https://robohash.org/${encodeURIComponent(activeProfile?.name||"user")}.png?size=64x64`;
+
   return (
     <header className="bg-white dark:bg-[#0a0a23] text-gray-900 dark:text-yellow-400 py-4 px-6 shadow-md transition-colors duration-300">
+      {/* Título centrado */}
       <div className="flex justify-center">
         <h1 className="text-4xl md:text-5xl font-serif font-semibold tracking-tight uppercase">
           🎬 Blockbuster Online
@@ -100,7 +78,26 @@ const Header = () => {
       </div>
 
       {!hideButtons && (
-        <div className="mt-2 flex justify-end">
+        // Aquí hemos cambiado justify-end por justify-between
+        <div className="mt-2 flex justify-between items-center">
+          {/* IZQUIERDA: perfil activo */}
+          {activeProfile && (
+            <button
+              onClick={() => navigate("/profiles")}
+              className="flex items-center space-x-2"
+            >
+              <img
+                src={avatarUrl}
+                alt={activeProfile.name}
+                className="w-8 h-8 rounded-full object-cover"
+              />
+              <span className="text-lg font-medium">
+                {activeProfile.name}
+              </span>
+            </button>
+          )}
+
+          {/* DERECHA: toggle de tema */}
           <button
             onClick={toggleTheme}
             className="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg shadow hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
@@ -143,14 +140,6 @@ const Header = () => {
               Agregar Serie
             </Link>
           )}
-
-          {/*
-          {user?.role === "admin" && (
-            <button onClick={handleSeed} className={btnStyle}>
-              🚀 Carga masiva
-            </button>
-          )}
-          */}
 
           {user?.role === "admin" && (
             <button onClick={handleReport} className={btnStyle}>

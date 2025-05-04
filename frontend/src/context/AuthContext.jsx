@@ -1,5 +1,3 @@
-// src/context/AuthContext.jsx
-
 import { createContext, useState, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
 import api from "../services/api";
@@ -7,9 +5,9 @@ import api from "../services/api";
 export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
- 
   const [token, setToken] = useState(null);
   const [user, setUser] = useState(null);
+  const [profiles, setProfiles] = useState([]);
   const [activeProfile, setActiveProfile] = useState(() => {
     const saved = localStorage.getItem("activeProfile");
     if (!saved) return null;
@@ -22,9 +20,11 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("activeProfile");
     setToken(null);
     setUser(null);
+    setProfiles([]);
     setActiveProfile(null);
   }, []);
 
+  // Cargar token existente y programar logout
   useEffect(() => {
     const savedToken = localStorage.getItem("token");
     if (!savedToken) return;
@@ -41,6 +41,24 @@ export function AuthProvider({ children }) {
     }
   }, [logout]);
 
+  // Cargar perfiles cuando token cambie
+  useEffect(() => {
+    if (!token) {
+      setProfiles([]);
+      return;
+    }
+    const load = async () => {
+      try {
+        const list = await api.profiles.list(token);
+        setProfiles(list);
+      } catch (err) {
+        console.error("Error cargando perfiles:", err);
+      }
+    };
+    load();
+  }, [token]);
+
+  // Persistir perfil activo
   useEffect(() => {
     if (activeProfile) {
       localStorage.setItem(
@@ -100,17 +118,60 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // CRUD de perfiles
+  const createProfile = async (data) => {
+    try {
+      await api.profiles.create(data, token);
+      const list = await api.profiles.list(token);
+      setProfiles(list);
+    } catch (err) {
+      toast.error("Error al crear perfil");
+      console.error(err);
+    }
+  };
+
+  const updateProfile = async (id, data) => {
+    try {
+      await api.profiles.update(id, data, token);
+      const list = await api.profiles.list(token);
+      setProfiles(list);
+      if (activeProfile?._id === id) {
+        const updated = list.find((p) => p._id === id);
+        setActiveProfile(updated);
+      }
+    } catch (err) {
+      toast.error("Error al actualizar perfil");
+      console.error(err);
+    }
+  };
+
+  const deleteProfile = async (id) => {
+    try {
+      await api.profiles.remove(id, token);
+      const list = await api.profiles.list(token);
+      setProfiles(list);
+      if (activeProfile?._id === id) setActiveProfile(null);
+    } catch (err) {
+      toast.error("Error al eliminar perfil");
+      console.error(err);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
         token,
         user,
+        profiles,
         activeProfile,
         setActiveProfile,
         login,
         logout,
         addToWatchlist,
         removeFromWatchlist,
+        createProfile,
+        updateProfile,
+        deleteProfile,
       }}
     >
       {children}

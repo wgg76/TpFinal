@@ -1,16 +1,14 @@
-// src/pages/LoginPage.jsx
-
 import React, { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { AuthContext } from "../context/AuthContext";
-import api from "../services/api";          
+import api from "../services/api";
 
 export default function LoginPage() {
   const [credentials, setCredentials] = useState({ email: "", password: "" });
   const { email, password } = credentials;
   const navigate = useNavigate();
-  const { login, setActiveProfile } = useContext(AuthContext);
+  const { login } = useContext(AuthContext);
 
   const API_BASE = import.meta.env.VITE_API_URL;
 
@@ -28,23 +26,13 @@ export default function LoginPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Error al iniciar sesión");
-  
+
       // 2) Guardamos el token en contexto y localStorage
       login(data.token);
-      console.log("🔑 JWT recibido:", data.token);
-      console.log("🌐 API_BASE:", API_BASE);
       toast.success("Inicio de sesión exitoso");
-  
-      // 3) Obtener perfiles existentes usando tu helper con el token recién obtenido
-      const perfiles = await api.profiles.list(data.token);
-  
-      // 4) Decidir ruta según existencia de perfiles
-      if (perfiles.length > 0) {
-        setActiveProfile(perfiles[0]);
-        navigate("/movies");
-      } else {
-        navigate("/profiles/new");
-      }
+
+      // 3) Redirigir siempre a la selección de perfiles
+      navigate("/profiles");
     } catch (err) {
       toast.error(err.message);
     }
@@ -100,7 +88,7 @@ export default function LoginPage() {
             Acceder
           </button>
           <p className="mt-5 sm:mt-6 text-center text-base sm:text-lg">
-            ¿No tienes cuenta?{" "}
+            ¿No tienes cuenta?{' '}
             <Link to="/register" className="text-blue-600 hover:underline">
               Regístrate
             </Link>

@@ -1,31 +1,36 @@
+// src/components/PrivateRoute.jsx
 import React, { useContext } from "react";
-import { useLocation, Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
 export default function PrivateRoute({
   children,
-  adminOnly = false,
   skipProfileCheck = false,
+  adminOnly = false,
 }) {
-  const { token, user, activeProfile } = useContext(AuthContext);
-  const { pathname } = useLocation();
+  const { token, activeProfile, user } = useContext(AuthContext);
+  const location = useLocation();
 
-  // 1) Si es la landing pública, la dejamos pasar sin más
-  if (pathname === "/" || pathname === "/home") {
+  // 1) Si no está logueado, al login
+  if (!token) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // 2) Si es ruta que puede saltarse el chequeo de perfil
+  if (skipProfileCheck) {
     return children;
   }
 
-  // 2) Guardias habituales
-  if (!token) {
-    return <Navigate to="/login" replace />;
-  }
-  if (!skipProfileCheck && !activeProfile) {
+  // 3) Si requiere perfil activo y no lo hay, redirige a /profiles
+  if (!activeProfile) {
     return <Navigate to="/profiles" replace />;
   }
+
+  // 4) Si es ruta solo admin y no tiene rol admin
   if (adminOnly && user.role !== "admin") {
     return <Navigate to="/" replace />;
   }
 
-  // 3) Ya autenticado y con perfil si hace falta
+  // 5) Todo ok
   return children;
 }
