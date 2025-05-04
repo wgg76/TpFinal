@@ -89,6 +89,7 @@ export default function Home() {
       </div>
 
       {!user && (
+      <div className="inline-flex items-center space-x-4">
         <>
         <Link
           to="/login"
