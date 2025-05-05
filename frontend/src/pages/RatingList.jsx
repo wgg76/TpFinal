@@ -53,7 +53,7 @@ export default function RatingList() {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
         {movies.map((m) => (
           <Link to={`/movies/${m._id}`} key={m._id} className="block">
-            <div className="bg-white/10 backdrop-blur-md p-4 rounded-lg shadow-md text-white flex flex-col">
+            <div className="bg-white/10 backdrop-blur-md p-4 rounded-lg shadow-md text-black flex flex-col">
               <div className="w-full h-64 overflow-hidden rounded mb-4">
                 <img
                   src={m.Poster}
