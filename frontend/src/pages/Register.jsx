@@ -7,7 +7,9 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { toast } from "react-toastify";
 
+// —————————————————————————————
 // Esquema de validación con Yup
+// —————————————————————————————
 const schema = yup.object({
   email: yup
     .string()
@@ -23,7 +25,9 @@ export default function Register() {
   const navigate = useNavigate();
   const API_BASE = import.meta.env.VITE_API_URL;
 
-  // React Hook Form
+  // —————————————————————————————
+  // React Hook Form con Yup
+  // —————————————————————————————
   const {
     register,
     handleSubmit,
@@ -43,12 +47,12 @@ export default function Register() {
       const result = await res.json();
       if (!res.ok) {
         toast.error(result.error || "Error al registrarse", {
-          onClose: () => window.location.reload(),  // 🔁 recarga tras el toast
+          onClose: () => window.location.reload(),
         });
         return;
       }
       toast.success("¡Registro exitoso! Ahora inicia sesión.", {
-        onClose: () => window.location.reload(),  // 🔁 recarga tras el toast
+        onClose: () => window.location.reload(),
       });
       navigate("/login");
     } catch (err) {
@@ -57,6 +61,7 @@ export default function Register() {
       });
     }
   };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-200">
       <form
@@ -65,7 +70,9 @@ export default function Register() {
       >
         <h1 className="text-2xl font-bold mb-4 text-center">Registrarse</h1>
 
+        {/* ———————————————————————— */}
         {/* Email */}
+        {/* ———————————————————————— */}
         <div className="mb-4">
           <label htmlFor="email" className="block mb-2">
             Email
@@ -84,7 +91,9 @@ export default function Register() {
           )}
         </div>
 
+        {/* ———————————————————————— */}
         {/* Contraseña */}
+        {/* ———————————————————————— */}
         <div className="mb-6">
           <label htmlFor="password" className="block mb-2">
             Contraseña
@@ -103,7 +112,9 @@ export default function Register() {
           )}
         </div>
 
+        {/* ———————————————————————— */}
         {/* Botones */}
+        {/* ———————————————————————— */}
         <button
           type="submit"
           disabled={isSubmitting}

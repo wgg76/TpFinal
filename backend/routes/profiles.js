@@ -1,7 +1,7 @@
 // src/routes/profiles.js
 import express from "express";
 import Profile from "../models/Profile.js";
-import User from "../models/User.js";                    // ⬅️ añadido
+import User from "../models/User.js";
 import { requireAuth } from "../middleware/requireAuth.js";
 
 const router = express.Router();
@@ -30,46 +30,43 @@ router.get("/", requireAuth, async (req, res) => {
  */
 router.post("/", requireAuth, async (req, res) => {
   const { name, dob, avatar } = req.body;
-  if (!name || !dob) {
-    return res.status(400).json({ error: "Faltan name o dob" });
+  if (!name || !dob || !avatar) {
+    return res.status(400).json({ error: "Faltan name, dob o avatar" });
   }
-  try {
-    const birth = new Date(dob);
-    const diffMs = Date.now() - birth.getTime();
-    const age = new Date(diffMs).getUTCFullYear() - 1970;
-    const type = age < 13 ? "child" : "standard";
 
-    // 📝 Recuperamos al usuario para obtener su email real
+  try {
+    // 1) Recuperar usuario para obtener el email
     const user = await User.findById(req.userId);
     if (!user) {
       return res.status(404).json({ error: "Usuario no encontrado" });
     }
 
+    // 2) Calcular edad y tipo
+    const birth = new Date(dob);
+    const diffMs = Date.now() - birth.getTime();
+    const age = new Date(diffMs).getUTCFullYear() - 1970;
+    const type = age < 13 ? "child" : "standard";
+
+    // 3) Crear perfil incluyendo age y type
     const nuevo = await Profile.create({
       name,
-      dob: birth,
+      dob:     birth,
+      avatar,
       age,
       type,
-      user: req.userId,
-      email: user.email,     // ⬅️ sustituido req.userEmail por user.email
-      avatar,
+      user:    req.userId,
+      email:   user.email,
     });
 
     return res.status(201).json(nuevo);
   } catch (err) {
-    // 🔥 Log completo del error en servidor para diagnóstico
     console.error("Error POST /profiles:", err);
-    // devolvemos mensaje y detalle para el client
-    return res.status(500).json({
-      error:   "Error interno al crear perfil",
-      details: err.message
-    });
+    return res.status(500).json({ error: err.message });
   }
 });
 
 /**
  * GET /api/profiles/:id/watchlist
- * Devuelve la watchlist de un perfil (propio o admin).
  */
 router.get("/:id/watchlist", requireAuth, async (req, res) => {
   try {
@@ -92,7 +89,6 @@ router.get("/:id/watchlist", requireAuth, async (req, res) => {
 
 /**
  * POST /api/profiles/:id/watchlist
- * Añade un ítem a la watchlist de un perfil (propio o admin).
  */
 router.post("/:id/watchlist", requireAuth, async (req, res) => {
   try {
@@ -117,7 +113,6 @@ router.post("/:id/watchlist", requireAuth, async (req, res) => {
 
 /**
  * DELETE /api/profiles/:id/watchlist/:itemId
- * Elimina un ítem de la watchlist (propio o admin).
  */
 router.delete("/:id/watchlist/:itemId", requireAuth, async (req, res) => {
   try {
@@ -141,12 +136,12 @@ router.delete("/:id/watchlist/:itemId", requireAuth, async (req, res) => {
 });
 
 /**
- * DELETE /api/profiles/:pid
+ * DELETE /api/profiles/:id
  * Elimina un perfil completo (propio o admin).
  */
-router.delete("/:pid", requireAuth, async (req, res) => {
+router.delete("/:id", requireAuth, async (req, res) => {
   try {
-    const perfil = await Profile.findById(req.params.pid);
+    const perfil = await Profile.findById(req.params.id);
     if (!perfil) {
       return res.status(404).json({ error: "Perfil no encontrado" });
     }
@@ -157,11 +152,46 @@ router.delete("/:pid", requireAuth, async (req, res) => {
       return res.status(403).json({ error: "Sin permiso" });
     }
 
-    await Profile.findByIdAndDelete(req.params.pid);
+    await Profile.findByIdAndDelete(req.params.id);
     return res.json({ message: "Perfil eliminado correctamente" });
   } catch (err) {
-    console.error("Error DELETE /profiles/:pid:", err);
+    console.error("Error DELETE /profiles/:id:", err);
     return res.status(500).json({ error: "Error interno del servidor" });
+  }
+});
+
+/**
+ * PUT /api/profiles/:id
+ * Actualiza un perfil existente (propio o admin), recalculando edad y tipo.
+ */
+router.put("/:id", requireAuth, async (req, res) => {
+  const { name, dob, avatar } = req.body;
+  if (!name || !dob || !avatar) {
+    return res.status(400).json({ error: "Faltan name, dob o avatar" });
+  }
+
+  try {
+    // 1) Busca el perfil
+    const perfil = await Profile.findById(req.params.id);
+    if (!perfil) {
+      return res.status(404).json({ error: "Perfil no encontrado" });
+    }
+
+    // 2) Actualiza campos
+    perfil.name   = name;
+    perfil.dob    = new Date(dob);
+    perfil.avatar = avatar;
+
+    // 3) Recalcula edad y tipo antes de guardar
+    const diffMs = Date.now() - perfil.dob.getTime();
+    perfil.age  = new Date(diffMs).getUTCFullYear() - 1970;
+    perfil.type = perfil.age < 13 ? "child" : "standard";
+
+    const updated = await perfil.save();
+    return res.json(updated);
+  } catch (err) {
+    console.error("Error PUT /profiles/:id:", err);
+    return res.status(500).json({ error: err.message });
   }
 });
 

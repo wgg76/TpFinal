@@ -1,5 +1,5 @@
 // src/context/AuthContext.jsx
-
+// @refresh reset
 import { createContext, useState, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
 import api from "../services/api";
@@ -55,22 +55,29 @@ export function AuthProvider({ children }) {
     }
   }, [token, logout]);
 
-  // 4) Carga perfiles cuando cambia el token
-  useEffect(() => {
-    if (!token) {
-      setProfiles([]);
-      return;
-    }
-    const load = async () => {
-      try {
-        const list = await api.profiles.list(token);
-        setProfiles(list);
-      } catch (err) {
-        console.error("Error cargando perfiles:", err);
+// 4) Carga perfiles cuando cambia el token
+useEffect(() => {
+  if (!token) {
+    setProfiles([]);
+    setActiveProfile(null);
+    return;
+  }
+  const load = async () => {
+    try {
+      const list = await api.profiles.list(token);
+      console.log("🚀 Perfiles cargados:", list);
+      setProfiles(list);
+
+      // Si no hay perfil activo o el activo ya no está en la lista, seleccionamos el primero
+      if ((!activeProfile || !list.some(p => p._id === activeProfile._id)) && list.length > 0) {
+        setActiveProfile(list[0]);
       }
-    };
-    load();
-  }, [token]);
+    } catch (err) {
+      console.error("Error cargando perfiles:", err);
+    }
+  };
+  load();
+}, [token, activeProfile]);
 
   // 5) Persistir perfil activo en localStorage
   useEffect(() => {

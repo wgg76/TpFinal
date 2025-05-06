@@ -1,23 +1,40 @@
-import React, { useState, useContext } from "react";
+// src/pages/LoginPage.jsx
+
+import React, { useContext } from "react";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { AuthContext } from "../context/AuthContext";
 
-export default function LoginPage() {
-  const [credentials, setCredentials] = useState({ email: "", password: "" });
-  const { email, password } = credentials;
-  const navigate = useNavigate();
-  const { login } = useContext(AuthContext);
+// 1. Definimos el esquema de validación con Yup
+const loginSchema = yup.object({
+  email: yup
+    .string()
+    .required("El email es obligatorio")
+    .email("Debe ser un email válido"),
+  password: yup.string().required("La contraseña es obligatoria"),
+}).required();
 
+export default function LoginPage() {
+  const { login } = useContext(AuthContext);
+  const navigate = useNavigate();
   const API_BASE = import.meta.env.VITE_API_URL;
 
-  const handleChange = (e) =>
-    setCredentials({ ...credentials, [e.target.name]: e.target.value });
+  // 2. Inicializamos react-hook-form con nuestro esquema
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting }
+  } = useForm({
+    resolver: yupResolver(loginSchema),
+    mode: "onBlur",
+  });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // 3. Función onSubmit reutiliza tu lógica de fetch
+  const onSubmit = async ({ email, password }) => {
     try {
-      // 1) Iniciar sesión y guardar token
       const res = await fetch(`${API_BASE}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -26,11 +43,8 @@ export default function LoginPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Error al iniciar sesión");
 
-      // 2) Guardamos el token en contexto y localStorage
       login(data.token);
-      toast.success("Inicio de sesión exitoso");
-
-      // 3) Redirigir siempre a la selección de perfiles
+      toast.success("¡Inicio de sesión exitoso!");
       navigate("/profiles");
     } catch (err) {
       toast.error(err.message);
@@ -41,53 +55,60 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">
         <form
-          onSubmit={handleSubmit}
+          onSubmit={handleSubmit(onSubmit)}
           className="bg-white p-6 sm:p-8 rounded shadow-lg w-full"
+          noValidate
         >
           <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 text-center">
             Iniciar Sesión
           </h2>
+
           <div className="mb-5 sm:mb-6">
             <label htmlFor="email" className="block mb-2 text-base sm:text-lg">
               Email
             </label>
             <input
               type="email"
-              name="email"
               id="email"
+              {...register("email")}
               placeholder="usuario@ejemplo.com"
-              value={email}
-              onChange={handleChange}
-              required
-              className="w-full p-3 text-base sm:text-lg rounded border focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className={`w-full p-3 text-base sm:text-lg rounded border focus:outline-none focus:ring-2 ${
+                errors.email ? "ring-red-500" : "focus:ring-blue-400"
+              }`}
             />
+            {errors.email && (
+              <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+            )}
           </div>
+
           <div className="mb-7 sm:mb-8">
-            <label
-              htmlFor="password"
-              className="block mb-2 text-base sm:text-lg"
-            >
+            <label htmlFor="password" className="block mb-2 text-base sm:text-lg">
               Contraseña
             </label>
             <input
               type="password"
-              name="password"
               id="password"
+              {...register("password")}
               placeholder="••••••••"
-              value={password}
-              onChange={handleChange}
-              required
-              className="w-full p-3 text-base sm:text-lg rounded border focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className={`w-full p-3 text-base sm:text-lg rounded border focus:outline-none focus:ring-2 ${
+                errors.password ? "ring-red-500" : "focus:ring-blue-400"
+              }`}
             />
+            {errors.password && (
+              <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+            )}
           </div>
+
           <button
             type="submit"
-            className="w-full py-3 text-lg sm:text-xl font-semibold rounded bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+            disabled={isSubmitting}
+            className="w-full py-3 text-lg sm:text-xl font-semibold rounded bg-blue-600 hover:bg-blue-700 text-white transition-colors disabled:opacity-50"
           >
-            Acceder
+            {isSubmitting ? "Validando..." : "Acceder"}
           </button>
+
           <p className="mt-5 sm:mt-6 text-center text-base sm:text-lg">
-            ¿No tienes cuenta?{' '}
+            ¿No tienes cuenta?{" "}
             <Link to="/register" className="text-blue-600 hover:underline">
               Regístrate
             </Link>

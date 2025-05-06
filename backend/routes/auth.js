@@ -16,9 +16,8 @@ const JWT_SECRET = process.env.JWT_SECRET || "tu-clave-secreta-super-segura";
  * Registro de usuario
  */
 authRouter.post("/register", async (req, res) => {
-  //console.log("BODY EN REGISTER:", req.body);
   try {
-    const { email, password, role } = req.body;
+    const { email, password } = req.body; // ya no tomamos role desde el cliente
 
     // Verificar si ya existe ese email
     const existing = await User.findOne({ email: email.toLowerCase().trim() });
@@ -36,19 +35,17 @@ authRouter.post("/register", async (req, res) => {
     // Hashear contraseña
     const hashed = await bcrypt.hash(password, 10);
 
-    // Crear usuario; si no se envía rol, por defecto "user"
+    // Crear usuario; el servidor impone siempre el rol "standard"
     const newUser = new User({
-      email: email.toLowerCase().trim(),
+      email:    email.toLowerCase().trim(),
       password: hashed,
-      role: role || "user",
+      role:     "standard",
     });
 
     await newUser.save();
     res.status(201).json({ message: "Usuario registrado con éxito" });
   } catch (err) {
-    //console.error("❌ Error en POST /auth/register:", err.message);
-    //console.error(err.stack);
-    res.status(500).json({error: err.message});
+    res.status(500).json({ error: err.message });
   }
 });
 
@@ -101,7 +98,6 @@ authRouter.post("/login", async (req, res) => {
       refreshToken,
     });
   } catch (err) {
-    //console.error("Error en /login:", err);
     res.status(500).json({ error: "Error al iniciar sesión" });
   }
 });
@@ -154,7 +150,6 @@ authRouter.post("/refresh", async (req, res) => {
       refreshToken: newRefreshToken,
     });
   } catch (err) {
-    //console.error("Error en /refresh:", err);
     return res.status(401).json({ error: "No autorizado" });
   }
 });
@@ -173,7 +168,6 @@ authRouter.post("/logout", async (req, res) => {
     await RefreshToken.deleteOne({ tokenHash: hash });
     return res.json({ message: "Cierre de sesión exitoso" });
   } catch (err) {
-    //console.error("Error en /logout:", err);
     return res.status(500).json({ error: "Error al cerrar sesión" });
   }
 });
