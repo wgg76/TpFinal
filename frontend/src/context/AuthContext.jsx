@@ -1,3 +1,5 @@
+// src/context/AuthContext.jsx
+
 import { createContext, useState, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
 import api from "../services/api";
@@ -5,8 +7,18 @@ import api from "../services/api";
 export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [token, setToken] = useState(null);
-  const [user, setUser] = useState(null);
+  // 1) Inicializamos el token directamente desde localStorage
+  const [token, setToken] = useState(() => localStorage.getItem("token"));
+
+  // 2) Inicializamos el user si hay token, extrayendo userId y role (ignoramos _exp)
+  const [user, setUser] = useState(() => {
+    if (!token) return null;
+    const { /* _exp, */ userId, role } = JSON.parse(
+      atob(token.split(".")[1])
+    );
+    return { userId, role };
+  });
+
   const [profiles, setProfiles] = useState([]);
   const [activeProfile, setActiveProfile] = useState(() => {
     const saved = localStorage.getItem("activeProfile");
@@ -24,24 +36,26 @@ export function AuthProvider({ children }) {
     setActiveProfile(null);
   }, []);
 
-  // Cargar token existente y programar logout
+  // 3) Efecto para programar logout automático
   useEffect(() => {
-    const savedToken = localStorage.getItem("token");
-    if (!savedToken) return;
-    const { exp, userId, role } = JSON.parse(
-      atob(savedToken.split(".")[1])
+    if (!token) return;
+    const { exp: _exp, userId, role } = JSON.parse(
+      atob(token.split(".")[1])
     );
-    if (exp * 1000 < Date.now()) {
+    // Si ya expiró, cerramos sesión
+    if (_exp * 1000 < Date.now()) {
       logout();
     } else {
-      setToken(savedToken);
+      // Programamos el timeout
+      const timeoutMs = _exp * 1000 - Date.now();
+      const timer = setTimeout(logout, timeoutMs);
+      // Guardamos user en el estado
       setUser({ userId, role });
-      const timeout = exp * 1000 - Date.now();
-      setTimeout(logout, timeout);
+      return () => clearTimeout(timer);
     }
-  }, [logout]);
+  }, [token, logout]);
 
-  // Cargar perfiles cuando token cambie
+  // 4) Carga perfiles cuando cambia el token
   useEffect(() => {
     if (!token) {
       setProfiles([]);
@@ -58,7 +72,7 @@ export function AuthProvider({ children }) {
     load();
   }, [token]);
 
-  // Persistir perfil activo
+  // 5) Persistir perfil activo en localStorage
   useEffect(() => {
     if (activeProfile) {
       localStorage.setItem(
@@ -70,18 +84,20 @@ export function AuthProvider({ children }) {
     }
   }, [activeProfile]);
 
+  // 6) Función de login: guarda token y programa logout
   const login = (newToken) => {
-    const { exp, userId, role } = JSON.parse(
+    const { exp: _exp, userId, role } = JSON.parse(
       atob(newToken.split(".")[1])
     );
     localStorage.setItem("token", newToken);
     setToken(newToken);
     setUser({ userId, role });
     setActiveProfile(null);
-    const timeout = exp * 1000 - Date.now();
-    setTimeout(logout, timeout);
+    const timeoutMs = _exp * 1000 - Date.now();
+    setTimeout(logout, timeoutMs);
   };
 
+  // 7) Watchlist
   const addToWatchlist = async (itemId) => {
     if (!activeProfile) {
       toast.info("Selecciona primero un perfil");
@@ -99,7 +115,6 @@ export function AuthProvider({ children }) {
       toast.error("No se pudo añadir a Favoritos");
     }
   };
-
   const removeFromWatchlist = async (itemId) => {
     if (!activeProfile) {
       toast.info("Selecciona primero un perfil");
@@ -118,7 +133,7 @@ export function AuthProvider({ children }) {
     }
   };
 
-  // CRUD de perfiles
+  // 8) CRUD de perfiles
   const createProfile = async (data) => {
     try {
       await api.profiles.create(data, token);
@@ -129,7 +144,6 @@ export function AuthProvider({ children }) {
       console.error(err);
     }
   };
-
   const updateProfile = async (id, data) => {
     try {
       await api.profiles.update(id, data, token);
@@ -144,7 +158,6 @@ export function AuthProvider({ children }) {
       console.error(err);
     }
   };
-
   const deleteProfile = async (id) => {
     try {
       await api.profiles.remove(id, token);

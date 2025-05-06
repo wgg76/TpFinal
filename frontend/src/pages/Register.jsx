@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { toast } from "react-toastify";
-import api from "../services/api";
 
 // Esquema de validación con Yup
 const schema = yup.object({
@@ -22,25 +21,42 @@ const schema = yup.object({
 
 export default function Register() {
   const navigate = useNavigate();
+  const API_BASE = import.meta.env.VITE_API_URL;
+
+  // React Hook Form
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: yupResolver(schema),
-    defaultValues: { email: "", password: "" },
   });
 
-  const onSubmit = async ({ email, password }) => {
+  // Función que maneja el envío
+  const onSubmit = async (data) => {
     try {
-      await api.auth.register(email, password, "standard");
-      toast.success("Usuario registrado con éxito");
-      navigate("/login", { replace: true });
+      const res = await fetch(`${API_BASE}/api/auth/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const result = await res.json();
+      if (!res.ok) {
+        toast.error(result.error || "Error al registrarse", {
+          onClose: () => window.location.reload(),  // 🔁 recarga tras el toast
+        });
+        return;
+      }
+      toast.success("¡Registro exitoso! Ahora inicia sesión.", {
+        onClose: () => window.location.reload(),  // 🔁 recarga tras el toast
+      });
+      navigate("/login");
     } catch (err) {
-      toast.error(err.message || "Error al registrarse");
+      toast.error("Error de conexión", {
+        onClose: () => window.location.reload(),
+      });
     }
   };
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-200">
       <form
@@ -49,6 +65,7 @@ export default function Register() {
       >
         <h1 className="text-2xl font-bold mb-4 text-center">Registrarse</h1>
 
+        {/* Email */}
         <div className="mb-4">
           <label htmlFor="email" className="block mb-2">
             Email
@@ -61,10 +78,13 @@ export default function Register() {
             placeholder="usuario@ejemplo.com"
           />
           {errors.email && (
-            <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+            <p className="text-red-500 text-sm mt-1">
+              {errors.email.message}
+            </p>
           )}
         </div>
 
+        {/* Contraseña */}
         <div className="mb-6">
           <label htmlFor="password" className="block mb-2">
             Contraseña
@@ -77,18 +97,20 @@ export default function Register() {
             placeholder="••••••••"
           />
           {errors.password && (
-            <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+            <p className="text-red-500 text-sm mt-1">
+              {errors.password.message}
+            </p>
           )}
         </div>
 
+        {/* Botones */}
         <button
           type="submit"
           disabled={isSubmitting}
           className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded mb-2 disabled:opacity-50"
         >
-          Registrarme
+          {isSubmitting ? "Registrando..." : "Registrarme"}
         </button>
-
         <button
           type="button"
           onClick={() => navigate("/", { replace: true })}

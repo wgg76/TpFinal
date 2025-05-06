@@ -1,5 +1,9 @@
+// src/App.jsx
 import React from "react";
 import { Routes, Route } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import { AuthProvider } from "./context/AuthContext";
 import { SearchProvider } from "./context/SearchContext";
 import { ThemeProvider } from "./context/ThemeContext";
@@ -35,37 +39,130 @@ function App() {
           <Route path="/home" element={<Home />} />
 
           {/* 2) Rating (login) */}
-          <Route path="/rating" element={<PrivateRoute skipProfileCheck><RatingList /></PrivateRoute>} />
+          <Route
+            path="/rating"
+            element={
+              <PrivateRoute skipProfileCheck>
+                <RatingList />
+              </PrivateRoute>
+            }
+          />
 
           {/* 3) Auth */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<Register />} />
 
           {/* 4) Perfiles */}
-          <Route path="/profiles" element={<PrivateRoute skipProfileCheck><Profiles /></PrivateRoute>} />
-          {/* Alias para /profiles/new funcionando igual */}
-          <Route path="/profiles/new" element={<PrivateRoute skipProfileCheck><Profiles /></PrivateRoute>} />
+          <Route
+            path="/profiles"
+            element={
+              <PrivateRoute skipProfileCheck>
+                <Profiles />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/profiles/new"
+            element={
+              <PrivateRoute skipProfileCheck>
+                <Profiles />
+              </PrivateRoute>
+            }
+          />
 
           {/* 5) Películas */}
-          <Route path="/movies" element={<PrivateRoute><MovieList /></PrivateRoute>} />
-          <Route path="/movies/create" element={<PrivateRoute adminOnly><MovieForm editMode={false} /></PrivateRoute>} />
-          <Route path="/movies/edit/:id" element={<PrivateRoute adminOnly><MovieForm editMode={true} /></PrivateRoute>} />
-          <Route path="/movies/:id" element={<PrivateRoute><MovieDetail /></PrivateRoute>} />
+          <Route
+            path="/movies"
+            element={
+              <PrivateRoute>
+                <MovieList />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/movies/create"
+            element={
+              <PrivateRoute adminOnly>
+                <MovieForm editMode={false} />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/movies/edit/:id"
+            element={
+              <PrivateRoute adminOnly>
+                <MovieForm editMode={true} />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/movies/:id"
+            element={
+              <PrivateRoute>
+                <MovieDetail />
+              </PrivateRoute>
+            }
+          />
 
           {/* 6) Series */}
-          <Route path="/series" element={<PrivateRoute><SeriesList /></PrivateRoute>} />
-          <Route path="/series/create" element={<PrivateRoute adminOnly><SeriesForm editMode={false} /></PrivateRoute>} />
-          <Route path="/series/edit/:id" element={<PrivateRoute adminOnly><SeriesForm editMode={true} /></PrivateRoute>} />
-          <Route path="/series/:id" element={<PrivateRoute><SeriesDetail /></PrivateRoute>} />
+          <Route
+            path="/series"
+            element={
+              <PrivateRoute>
+                <SeriesList />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/series/create"
+            element={
+              <PrivateRoute adminOnly>
+                <SeriesForm editMode={false} />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/series/edit/:id"
+            element={
+              <PrivateRoute adminOnly>
+                <SeriesForm editMode={true} />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/series/:id"
+            element={
+              <PrivateRoute>
+                <SeriesDetail />
+              </PrivateRoute>
+            }
+          />
 
           {/* 7) Watchlist */}
-          <Route path="/watchlist" element={<PrivateRoute><WatchlistPage /></PrivateRoute>} />
+          <Route
+            path="/watchlist"
+            element={
+              <PrivateRoute>
+                <WatchlistPage />
+              </PrivateRoute>
+            }
+          />
 
           {/* 8) Catch all */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
       <Footer />
+
+      {/* Toasts */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+      />
     </div>
   );
 }
