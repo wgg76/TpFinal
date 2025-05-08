@@ -22,25 +22,36 @@ export default function Home() {
   const [trailers, setTrailers] = useState([]);
 
   useEffect(() => {
-    // Expresión de flecha en lugar de declaración anidada
+    // Si no tenemos API key, no intentamos cargar trailers
+    if (!TMDB_KEY) {
+      console.warn("VITE_TMDB_API_KEY no está definida");
+      return;
+    }
+
     const loadTrailers = async () => {
       try {
-        // 1) Traer trending películas y series
-        const [moviesRes, tvRes] = await Promise.all([
+        // 1) Traer trending películas y series, con chequeo de status
+        const responses = await Promise.all([
           fetch(`${TMDB}/trending/movie/week?api_key=${TMDB_KEY}`),
           fetch(`${TMDB}/trending/tv/week?api_key=${TMDB_KEY}`),
-        ]).then(rs => Promise.all(rs.map(r => r.json())));
+        ]);
 
-        const movies = moviesRes.results;
-        const series = tvRes.results;
+        // Convertir cada respuesta a JSON sólo si ok, sino fallback { results: [] }
+        const [moviesRes, tvRes] = await Promise.all(
+          responses.map(r => (r.ok ? r.json() : Promise.resolve({ results: [] })))
+        );
 
-        // 2) Función flecha para obtener trailer YouTube de un item
+        const movies = moviesRes.results || [];
+        const series = tvRes.results || [];
+
+        // 2) Función flecha para obtener trailer YouTube de un item,
+        //    con manejo de status similar
         const getTrailer = async (item, type) => {
           const res = await fetch(
             `${TMDB}/${type}/${item.id}/videos?api_key=${TMDB_KEY}`
           );
-          const { results } = await res.json();
-          const trailer = results.find(
+          const json = res.ok ? await res.json() : { results: [] };
+          const trailer = (json.results || []).find(
             v => v.type === "Trailer" && v.site === "YouTube"
           );
           return trailer
