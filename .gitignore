@@ -1,6 +1,15 @@
+<<<<<<< HEAD
 # Dependencias instaladas
 node_modules/
 # Locks generados
 package-lock.json
 # Archivos de entorno
 *.env
+=======
+# Dependencias instaladas
+node_modules/
+# Locks generados
+package-lock.json
+# Archivos de entorno
+*.env
+>>>>>>> 5582115 (veamos que sale)

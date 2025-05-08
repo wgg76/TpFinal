@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // src/context/SearchContext.jsx
 import React, { createContext, useState } from "react";
 
@@ -13,3 +14,20 @@ export const SearchProvider = ({ children }) => {
     </SearchContext.Provider>
   );
 };
+=======
+// src/context/SearchContext.jsx
+import React, { createContext, useState } from "react";
+
+export const SearchContext = createContext();
+
+export const SearchProvider = ({ children }) => {
+
+
+  const [searchTerm, setSearchTerm] = useState("");
+  return (
+    <SearchContext.Provider value={{ searchTerm, setSearchTerm }}>
+      {children}
+    </SearchContext.Provider>
+  );
+};
+>>>>>>> 5582115 (veamos que sale)

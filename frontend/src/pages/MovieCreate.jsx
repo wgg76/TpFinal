@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // src/pages/MovieCreate.jsx
 import React, { useState, useContext } from "react";
 import { toast } from "react-toastify";
@@ -274,3 +275,12 @@ const MovieCreate = () => {
 
 export default MovieCreate;
 
+=======
+import React from "react";
+import MovieForm from "./MovieForm";
+
+export default function MovieCreate() {
+  // editMode=false hará que MovieForm ponga el título “Crear película”
+  return <MovieForm editMode={false} />;
+}
+>>>>>>> 5582115 (veamos que sale)

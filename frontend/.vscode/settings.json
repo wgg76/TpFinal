@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
   "tailwindCSS.includeLanguages": {
     "javascript": "javascriptreact",
@@ -5,3 +6,12 @@
   },
   "tailwindCSS.emmetCompletions": true
 }
+=======
+{
+  "tailwindCSS.includeLanguages": {
+    "javascript": "javascriptreact",
+    "typescript": "typescriptreact"
+  },
+  "tailwindCSS.emmetCompletions": true
+}
+>>>>>>> 5582115 (veamos que sale)

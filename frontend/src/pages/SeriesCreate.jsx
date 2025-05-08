@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // src/pages/SeriesCreate.jsx
 import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
@@ -136,3 +137,12 @@ const SeriesCreate = () => {
 };
 
 export default SeriesCreate;
+=======
+import React from "react";
+import SeriesForm from "./SeriesForm";
+
+export default function SeriesCreate() {
+  // editMode=false hará que SeriesForm ponga el título “Crear serie”
+  return <SeriesForm editMode={false} />;
+}
+>>>>>>> 5582115 (veamos que sale)
