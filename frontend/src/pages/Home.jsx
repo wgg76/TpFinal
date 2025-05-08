@@ -22,7 +22,8 @@ export default function Home() {
   const [trailers, setTrailers] = useState([]);
 
   useEffect(() => {
-    async function load() {
+    // Expresión de flecha en lugar de declaración anidada
+    const loadTrailers = async () => {
       try {
         // 1) Traer trending películas y series
         const [moviesRes, tvRes] = await Promise.all([
@@ -33,8 +34,8 @@ export default function Home() {
         const movies = moviesRes.results;
         const series = tvRes.results;
 
-        // 2) Función para obtener trailer YouTube de un item
-        async function getTrailer(item, type) {
+        // 2) Función flecha para obtener trailer YouTube de un item
+        const getTrailer = async (item, type) => {
           const res = await fetch(
             `${TMDB}/${type}/${item.id}/videos?api_key=${TMDB_KEY}`
           );
@@ -45,7 +46,7 @@ export default function Home() {
           return trailer
             ? `https://www.youtube.com/embed/${trailer.key}`
             : null;
-        }
+        };
 
         // 3) Para la lista mezclada, obtenemos trailers en paralelo
         const pool = [
@@ -75,8 +76,9 @@ export default function Home() {
       } catch (err) {
         console.error("Error cargando trailers TMDB:", err);
       }
-    }
-    load();
+    };
+
+    loadTrailers();
   }, []);
 
   return (

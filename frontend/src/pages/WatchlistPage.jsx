@@ -75,7 +75,8 @@ export default function WatchlistPage() {
     if (!isConfirmed) return;
 
     try {
-      const updated = await removeFromWatchlist(itemId);
+      // Llamamos a la función del context sin asignarla a una variable
+      await removeFromWatchlist(itemId);
       setItems(prev => prev.filter(i => i._id !== itemId));
       toast.info("Eliminado de favoritos");
     } catch {
