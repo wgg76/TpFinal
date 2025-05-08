@@ -1,0 +1,6 @@
+# Dependencias instaladas
+node_modules/
+# Locks generados
+package-lock.json
+# Archivos de entorno
+*.env
