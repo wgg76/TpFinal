@@ -86,3 +86,5 @@ npm run dev
 Este proyecto está bajo la licencia [MIT](LICENSE) © Walter Gerhardt
 
 https://blockbuster-online-tpfinal.onrender.com
+
+Creador Walter guillermo gerhardt
